@@ -68,11 +68,11 @@ const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, class
         return { fontSize: '30cqw', top: '3%', left: '0', width: '100%', zIndex: 20 };
       case '👓':
         // Buscando el nivel superior (-1%)
-        return { fontSize: '40cqw', top: '30%', left: '0', width: '100%', zIndex: 20 };
+        return { fontSize: '40cqw', top: '25%', left: '0', width: '100%', zIndex: 20 };
       case '🎀':
       default:
         // Listón en el lateral derecho
-        return { fontSize: '24cqw', top: '12%', left: '24%', transform: 'rotate(15deg)', zIndex: 20 };
+        return { fontSize: '24cqw', top: '18%', left: '24%', transform: 'rotate(15deg)', zIndex: 20 };
     }
   };
 
