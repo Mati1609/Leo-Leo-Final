@@ -1,0 +1,9 @@
+{
+  "name": "Remix: Leo Leo - Juego Educativo 2",
+  "description": "Una plataforma de aprendizaje lúdica y táctil para niños de 6 a 10 años, diseñada para fomentar el progreso en lenguaje y matemáticas con Leo el León.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": []
+}

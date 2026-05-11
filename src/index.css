@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Lexend:wght@400;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Lexend", sans-serif;
+  
+  --color-surface: #fbf9f4;
+  --color-surface-dim: #dbdad5;
+  --color-surface-bright: #fbf9f4;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f5f3ee;
+  --color-surface-container: #f0eee9;
+  --color-surface-container-high: #eae8e3;
+  --color-surface-container-highest: #e4e2dd;
+  --color-on-surface: #1b1c19;
+  --color-on-surface-variant: #42484b;
+  
+  --color-primary: #446370;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #a9c9d9;
+  --color-on-primary-container: #365563;
+  
+  --color-secondary: #4d6451;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d0e9d1;
+  --color-on-secondary-container: #536a57;
+  
+  --color-tertiary: #675f35;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #d0c492;
+  --color-on-tertiary-container: #595128;
+  
+  --color-primary-fixed: #c7e7f8;
+  --color-primary-fixed-dim: #abcbdb;
+  --color-tertiary-fixed: #f0e3ae;
+  --color-tertiary-fixed-dim: #d3c794;
+
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+}
+
+@layer components {
+  .chunky-button {
+    @apply relative transition-all duration-75 active:translate-y-[4px];
+  }
+  
+  .chunky-shadow-primary {
+    @apply shadow-[0_6px_0_0_#2c4b58] active:shadow-none;
+  }
+
+  .chunky-shadow-secondary {
+    @apply shadow-[0_6px_0_0_#b4cdb6] active:shadow-none;
+  }
+
+  .chunky-shadow-tertiary {
+    @apply shadow-[0_6px_0_0_#d3c794] active:shadow-none;
+  }
+}
+
+body {
+  @apply bg-surface text-on-surface font-body;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-sans;
+}
+
+@keyframes bounce-custom {
+  0%, 100% {
+    transform: translate(-50%, -25%);
+    animation-timing-function: cubic-bezier(0.8,0,1,1);
+  }
+  50% {
+    transform: translate(-50%, 0);
+    animation-timing-function: cubic-bezier(0,0,0.2,1);
+  }
+}
+
+.bounce-animation {
+  animation: bounce-custom 1.5s infinite;
+}
