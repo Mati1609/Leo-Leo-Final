@@ -68,7 +68,7 @@ const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, class
         return { fontSize: '30cqw', top: '3%', left: '0', width: '100%', zIndex: 20 };
       case '👓':
         // Buscando el nivel superior (-1%)
-        return { fontSize: '40cqw', top: '25%', left: '0', width: '100%', zIndex: 20 };
+        return { fontSize: '45cqw', top: '25%', left: '0', width: '100%', zIndex: 20 };
       case '🎀':
       default:
         // Listón en el lateral derecho
