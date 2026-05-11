@@ -4,16 +4,14 @@ class ProceduralBGM {
   private currentTimeout: number | undefined;
   
   private notes = [
-    // Upbeat C Major bouncy melody
     261.63, 392.00, 329.63, 523.25, 392.00, 659.25, 523.25, 783.99,
     659.25, 523.25, 392.00, 329.63, 523.25, 392.00, 329.63, 261.63,
-    // F Major bouncy
     349.23, 523.25, 440.00, 698.46, 523.25, 880.00, 698.46, 1046.50,
     880.00, 698.46, 523.25, 440.00, 698.46, 523.25, 440.00, 349.23
   ];
   
   private step = 0;
-  private tempoMs = 280; // upbeat pace
+  private tempoMs = 280;
   public volume = 0.5;
 
   start(ctx: AudioContext) {
@@ -34,20 +32,17 @@ class ProceduralBGM {
     if (!this.isPlaying || !this.ctx) return;
     
     const freq = this.notes[this.step % this.notes.length];
-    
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     
-    // Music box / xylophone sound
     osc.type = 'sine';
     osc.frequency.value = freq;
     
-    // Envelope for soft, relaxing strike
     const maxGain = 0.08 * this.volume;
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(maxGain, now + 0.05);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + this.tempoMs / 1000 + 0.5); // long tail
+    gain.gain.exponentialRampToValueAtTime(0.001, now + this.tempoMs / 1000 + 0.5);
     
     osc.connect(gain);
     gain.connect(this.ctx.destination);
@@ -79,40 +74,49 @@ class SoundService {
   private setupInteractionListeners = () => {
     const handleInteract = () => {
       this.resumeBGMOnInteract();
-      // Remove listeners after first interaction
-      window.removeEventListener('click', handleInteract);
-      window.removeEventListener('touchstart', handleInteract);
-      window.removeEventListener('keydown', handleInteract);
-      window.removeEventListener('pointerdown', handleInteract);
     };
 
-    window.addEventListener('click', handleInteract, { once: true });
-    window.addEventListener('touchstart', handleInteract, { once: true });
-    window.addEventListener('keydown', handleInteract, { once: true });
-    window.addEventListener('pointerdown', handleInteract, { once: true });
+    // Sin { once: true } — en iOS a veces no dispara correctamente
+    // Los removemos manualmente después de la primera interacción
+    const events = ['click', 'touchstart', 'touchend', 'keydown', 'pointerdown'];
+    
+    const onceHandler = () => {
+      handleInteract();
+      events.forEach(e => window.removeEventListener(e, onceHandler));
+    };
+
+    events.forEach(e => window.addEventListener(e, onceHandler, { passive: true }));
   };
 
-  private initCtx() {
+  private async initCtx() {
     if (!this.audioCtx) {
-      this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      // iOS requiere webkit prefix
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      this.audioCtx = new AudioCtx();
     }
+
+    // CRÍTICO en iOS: siempre intentar resume si está suspended
     if (this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
+      try {
+        await this.audioCtx.resume();
+      } catch (e) {
+        console.warn('AudioContext resume failed:', e);
+      }
     }
   }
 
-  playBGM() {
+  async playBGM() {
     if (this.isMuted) return;
-    this.initCtx();
-    if (this.audioCtx) {
+    await this.initCtx();
+    if (this.audioCtx && this.audioCtx.state === 'running') {
       this.proceduralBgm.start(this.audioCtx);
     }
   }
 
-  resumeBGMOnInteract() {
+  async resumeBGMOnInteract() {
     this.hasInteracted = true;
     if (!this.isMuted) {
-      this.playBGM();
+      await this.playBGM();
     }
   }
 
@@ -132,10 +136,10 @@ class SoundService {
     return this.isMuted;
   }
 
-  playSFX(type: 'correct' | 'incorrect' | 'click' | 'coin') {
+  async playSFX(type: 'correct' | 'incorrect' | 'click' | 'coin') {
     if (this.isMuted) return;
-    this.initCtx();
-    if (!this.audioCtx) return;
+    await this.initCtx();
+    if (!this.audioCtx || this.audioCtx.state !== 'running') return;
 
     const now = this.audioCtx.currentTime;
     const osc = this.audioCtx.createOscillator();
@@ -148,7 +152,6 @@ class SoundService {
 
     switch (type) {
       case 'click':
-        // A very short, gentle woodblock tick
         osc.type = 'sine';
         osc.frequency.setValueAtTime(1200, now);
         osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
@@ -157,21 +160,21 @@ class SoundService {
         osc.start(now);
         osc.stop(now + 0.05);
         break;
+
       case 'correct':
-        // A delightful quick major arpeggio
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(523.25, now); // C5
-        osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-        osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-        osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.1);
+        osc.frequency.setValueAtTime(783.99, now + 0.2);
+        osc.frequency.setValueAtTime(1046.50, now + 0.3);
         gainNode.gain.setValueAtTime(0.2 * baseGain, now);
         gainNode.gain.linearRampToValueAtTime(0.1 * baseGain, now + 0.3);
         gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
         osc.start(now);
         osc.stop(now + 0.5);
         break;
+
       case 'incorrect':
-        // A dissonant, descending "womp" that is clear for children
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(200, now);
         osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
@@ -190,11 +193,11 @@ class SoundService {
         osc.stop(now + 0.3);
         osc2.stop(now + 0.3);
         break;
+
       case 'coin':
-        // "Chaching" or double ding
         osc.type = 'square';
-        osc.frequency.setValueAtTime(987.77, now); // B5
-        osc.frequency.setValueAtTime(1318.51, now + 0.1); // E6
+        osc.frequency.setValueAtTime(987.77, now);
+        osc.frequency.setValueAtTime(1318.51, now + 0.1);
         gainNode.gain.setValueAtTime(0.1 * baseGain, now);
         gainNode.gain.linearRampToValueAtTime(0.1 * baseGain, now + 0.3);
         gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
@@ -205,4 +208,5 @@ class SoundService {
   }
 }
 
+export const soundService = new SoundService();
 export const soundService = new SoundService();
