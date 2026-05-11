@@ -63,12 +63,12 @@ const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, class
     // Afinación de posición y tamaño - Ajuste final
     switch (accessory) {
       case '🎩':
-        return { fontSize: '0.00001cqw', top: '1%', left: '0', width: '100%', zIndex: 20 };
+        return { fontSize: '24cqw', top: '1%', left: '0', width: '100%', zIndex: 20 };
       case '👑':
-        return { fontSize: '0.000005cqw', top: '3%', left: '0', width: '100%', zIndex: 20 };
+        return { fontSize: '24cqw', top: '3%', left: '0', width: '100%', zIndex: 20 };
       case '👓':
         // Buscando el nivel superior (-1%)
-        return { fontSize: '420cqw', top: '-1%', left: '0', width: '100%', zIndex: 20 };
+        return { fontSize: '24cqw', top: '-1%', left: '0', width: '100%', zIndex: 20 };
       case '🎀':
       default:
         // Listón en el lateral derecho
