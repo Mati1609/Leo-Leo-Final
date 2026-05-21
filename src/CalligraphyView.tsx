@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Eraser, Check, Volume2, PenTool } from 'lucide-react';
-import { soundService } from '../services/soundService';
+import { soundService } from './services/soundService';
 
 interface CalligraphyViewProps {
   onBack: () => void;
