@@ -50,7 +50,7 @@ import {
   Radar
 } from 'recharts';
 import { AppState, AppView, UserProfile, CategoryProgress, AvatarConfig } from './types';
-import { generateLessonQuestions, GeneratedQuestion } from './services/geminiService';
+import { generateLessonQuestions, GeneratedQuestion } from '../services/geminiService';
 import { CalligraphyView } from './CalligraphyView';
 
 // --- Components ---
