@@ -1309,7 +1309,6 @@ export default function App() {
               onFinish={handleFinishLesson}
             />
           )}
-          )}
           {state.view === 'shop' && state.returnToView !== 'lesson' && (
             <ShopView 
               onBuyCoins={handleBuyCoins} 
