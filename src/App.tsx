@@ -1303,12 +1303,13 @@ export default function App() {
               onBuyCoins={handleBuyCoins}
               onAnswerResult={handleAnswerResult}
             />
+          )}  
           {state.view === 'calligraphy' && (
-              <CalligraphyView 
+            <CalligraphyView 
               onBack={() => setState({ ...state, view: 'map', activeCategory: null })}
               onFinish={handleFinishLesson}
             />
-           )
+          )}  
           {state.view === 'shop' && state.returnToView !== 'lesson' && (
             <ShopView 
               onBuyCoins={handleBuyCoins} 
