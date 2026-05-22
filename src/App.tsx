@@ -1725,6 +1725,26 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
           </div>
         </div>
       </div>
+      {activeCategory === 'lenguaje' && user.grade === '1ro básico' && (
+  <div className="mb-8 p-6 bg-primary-fixed rounded-3xl border-4 border-primary-container flex flex-col sm:flex-row items-center gap-6 shadow-[0_6px_0_0_#a9c9d9]">
+    <div className="w-20 h-20 shrink-0 bg-white rounded-2xl flex items-center justify-center border-4 border-primary-container shadow-inner">
+      <span className="text-4xl">✏️</span>
+    </div>
+    <div className="flex-1 text-center sm:text-left">
+      <span className="inline-block bg-primary text-white text-xs font-bold px-3 py-1 rounded-full mb-2 uppercase tracking-wider">
+        ¡Actividad especial!
+      </span>
+      <h3 className="text-2xl font-extrabold text-on-primary-container mb-1">Práctica de Caligrafía</h3>
+      <p className="text-on-primary-container/80 font-medium">Traza palabras y mejora tu escritura con Leo.</p>
+    </div>
+    <button
+      onClick={() => { soundService.playSFX('click'); onGoToCalligraphy(); }}
+      className="shrink-0 bg-primary text-white font-bold text-lg px-8 py-4 rounded-full chunky-button chunky-shadow-primary whitespace-nowrap"
+    >
+      ¡Practicar!
+    </button>
+  </div>
+)}
     </main>
   );
 };
