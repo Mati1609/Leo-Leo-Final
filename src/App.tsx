@@ -51,7 +51,7 @@ import {
 } from 'recharts';
 import { AppState, AppView, UserProfile, CategoryProgress, AvatarConfig } from './types.ts';
 import { generateLessonQuestions, GeneratedQuestion } from './services/geminiService';
-import { CalligraphyView } from './components/CalligraphyView';
+import { CalligraphyView } from './CalligraphyView';
 
 // --- Components ---
 
