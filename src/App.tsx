@@ -49,34 +49,17 @@ import {
   PolarRadiusAxis,
   Radar
 } from 'recharts';
-import { AppState, AppView, UserProfile, CategoryProgress, AvatarConfig } from './types';
+import { AppState, AppView, UserProfile, CategoryProgress, AvatarConfig } from './types.ts';
 import { generateLessonQuestions, GeneratedQuestion } from './services/geminiService';
-import { CalligraphyView } from './CalligraphyView';
+import { CalligraphyView } from './components/CalligraphyView';
 
 // --- Components ---
 
 const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, className?: string }) => {
   const [imageError, setImageError] = useState(false);
   
-  if (!config) return <img src="/logo.png" referrerPolicy="no-referrer" alt="Leo" className={`object-cover ${className}`} />;
+  if (!config) return <div className={`flex items-center justify-center bg-surface-container ${className}`}><img src="/logo.png" referrerPolicy="no-referrer" alt="Leo" className="w-[80%] h-[80%] object-contain" /></div>;
   
-  const getAccessoryStyle = (accessory: string) => {
-    // Afinación de posición y tamaño - Ajuste final
-    switch (accessory) {
-      case '🎩':
-        return { fontSize: '30cqw', top: '3%', left: '0', width: '100%', zIndex: 20 };
-      case '👑':
-        return { fontSize: '30cqw', top: '3%', left: '0', width: '100%', zIndex: 20 };
-      case '👓':
-        // Buscando el nivel superior (-1%)
-        return { fontSize: '45cqw', top: '23%', left: '0', width: '100%', zIndex: 20 };
-      case '🎀':
-      default:
-        // Listón en el lateral derecho
-        return { fontSize: '24cqw', top: '18%', left: '24%', transform: 'rotate(15deg)', zIndex: 20 };
-    }
-  };
-
   return (
     <div className={`@container relative flex items-center justify-center ${config.color} ${className} overflow-visible`}>
       <div className="relative inline-flex items-center justify-center w-full h-full">
@@ -89,13 +72,7 @@ const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, class
             referrerPolicy="no-referrer"
           />
         ) : (
-          <span className="text-opacity-100 z-10 leading-none" style={{fontSize: '80cqw'}}>{config.emoji}</span>
-        )}
-        
-        {config.accessory && (
-          <span className="absolute drop-shadow-md leading-none flex justify-center w-full pointer-events-none" style={getAccessoryStyle(config.accessory)}>
-            {config.accessory}
-          </span>
+          <span className="text-primary font-black z-10 leading-none" style={{fontSize: '20cqw'}}>LEO</span>
         )}
       </div>
     </div>
@@ -156,7 +133,7 @@ const Header = ({ coins, onSettings }: { coins: number; onSettings: () => void }
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-20 bg-white border-b-4 border-surface-container shadow-sm">
+    <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 sm:px-6 h-16 sm:h-20 bg-white border-b-4 border-surface-container shadow-sm">
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-tertiary-fixed rounded-full border-2 border-primary-container overflow-hidden">
           <img 
@@ -211,7 +188,7 @@ const Header = ({ coins, onSettings }: { coins: number; onSettings: () => void }
 };
 
 const BottomNav = ({ activeView, setView }: { activeView: AppView; setView: (v: AppView) => void }) => (
-  <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-24 bg-white border-t-4 border-surface-container shadow-lg rounded-t-[32px]">
+  <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-20 sm:h-24 bg-white border-t-4 border-surface-container shadow-lg rounded-t-[32px]">
     {[
       { id: 'map', icon: Home, label: 'Inicio' },
       { id: 'shop', icon: ShoppingBag, label: 'Tienda' },
@@ -248,7 +225,7 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
 
   const avatars = ['🦁'];
   const avatarColors = ['bg-orange-200', 'bg-blue-200', 'bg-green-200', 'bg-purple-200', 'bg-yellow-200', 'bg-pink-200'];
-  const accessories = ['', '👑', '👓', '🎩', '🎀'];
+  const accessories = ['', '', '', '', ''];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,30 +239,30 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
   };
 
   return (
-    <div className="max-w-xl mx-auto px-6 py-12">
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-full bg-surface-container rounded-full h-4 mb-2 overflow-hidden border border-outline-variant/20">
+    <div className="max-w-xl mx-auto px-6 py-8 sm:py-12 min-h-screen flex flex-col justify-center">
+      <div className="flex flex-col items-center mb-6 sm:mb-8">
+        <div className="w-full bg-surface-container rounded-full h-3 sm:h-4 mb-2 overflow-hidden border border-outline-variant/20">
           <div 
             className="bg-primary h-full rounded-full transition-all duration-300" 
             style={{ width: `${(step / 4) * 100}%` }}
           />
         </div>
-        <span className="font-bold text-primary tracking-wide">Paso {step} de 4</span>
+        <span className="font-bold text-primary tracking-wide text-sm">Paso {step} de 4</span>
       </div>
 
-      <div className="flex flex-col items-center text-center mb-10">
-        <div className="relative mb-4">
+      <div className="flex flex-col items-center text-center mb-6 sm:mb-10">
+        <div className="relative mb-2 sm:mb-4">
           <img 
             src="/logo.png" 
             referrerPolicy="no-referrer"
             alt="Leo" 
-            className="w-40 h-auto"
+            className="w-24 sm:w-40 h-auto"
           />
-          <div className="absolute -top-4 -right-16 bg-tertiary-fixed text-on-tertiary-fixed px-6 py-3 rounded-xl rounded-bl-none shadow-[4px_4px_0_0_#d3c794] border-2 border-tertiary-fixed-dim">
-            <span className="font-bold text-xl">¡Hola!</span>
+          <div className="absolute -top-2 -right-12 sm:-top-4 sm:-right-16 bg-tertiary-fixed text-on-tertiary-fixed px-4 py-2 sm:px-6 sm:py-3 rounded-xl rounded-bl-none shadow-[4px_4px_0_0_#d3c794] border-2 border-tertiary-fixed-dim">
+            <span className="font-bold text-base sm:text-xl">¡Hola!</span>
           </div>
         </div>
-        <h1 className="text-4xl font-extrabold text-primary mt-4">¡Cuéntanos sobre ti!</h1>
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-primary mt-2">¡Cuéntanos sobre ti!</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -373,16 +350,19 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
             </div>
 
             <div className="space-y-3">
-              <label className="font-bold text-sm text-on-surface-variant px-2 uppercase tracking-wider">Acesorio</label>
-              <div className="flex justify-center gap-3">
+              <label className="font-bold text-sm text-on-surface-variant px-2 uppercase tracking-wider">Accesorio (Próximamente)</label>
+              <div className="flex justify-center gap-3 opacity-60">
                 {accessories.map(acc => (
                   <button
                     key={acc || 'none'}
                     type="button"
-                    onClick={() => setForm({...form, avatar: {...form.avatar, accessory: acc}})}
-                    className={`text-3xl w-14 h-14 rounded-2xl flex items-center justify-center transition-all chunky-button ${form.avatar.accessory === acc ? 'bg-primary-container border-4 border-primary shadow-[0_4px_0_0_#bbbbbb] scale-110' : 'bg-surface-container border-2 border-outline-variant/30 hover:scale-105'}`}
+                    onClick={() => { 
+                      soundService.playSFX('click');
+                      // Non-functional: don't update state
+                    }}
+                    className={`text-3xl w-14 h-14 rounded-2xl flex items-center justify-center transition-all chunky-button bg-surface-container border-2 border-outline-variant/30 hover:bg-surface-container-high`}
                   >
-                    {acc ? acc : <X className="w-6 h-6 text-on-surface-variant/50" />}
+                    {/* Empty slots for non-functional accessories */}
                   </button>
                 ))}
               </div>
@@ -423,7 +403,7 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
   const getLevel = (p: number) => Math.floor(p / 20); // 100 / 5 = 20% per level
 
   return (
-    <main className="pt-28 pb-32 px-6 max-w-4xl mx-auto min-h-screen">
+    <main className="pt-20 sm:pt-28 pb-24 sm:pb-32 px-6 max-w-4xl mx-auto min-h-screen">
       <section className="mb-8 text-center md:text-left">
         <h1 className="text-4xl font-extrabold text-on-background mb-2">¡Elige tu aventura!</h1>
         <p className="text-xl text-on-surface-variant">¿Qué quieres aprender hoy con Leo?</p>
@@ -432,15 +412,15 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         <button 
           onClick={() => { soundService.playSFX('click'); onSelectLesson('lenguaje'); }}
-          className="bg-[#A9C9D9] p-8 rounded-xl border-b-8 border-[#8FB6C6] text-left chunky-button flex flex-col justify-between h-64 group relative overflow-hidden"
+          className="bg-[#A9C9D9] p-6 sm:p-8 rounded-xl border-b-8 border-[#8FB6C6] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group relative overflow-hidden"
         >
           <div className="flex justify-between items-start">
-            <img src="/leon-lenguaje.png" alt="Lenguaje" className="w-[93px] h-[93px] object-contain filter drop-shadow-md" />
-            <span className="bg-white/30 px-3 py-1 rounded-full text-white font-bold text-sm">Nivel {getLevel(progress.lenguaje)}/5</span>
+            <img src="/leon-lenguaje.png" alt="Lenguaje" className="w-16 h-16 sm:w-[93px] sm:h-[93px] object-contain filter drop-shadow-md" />
+            <span className="bg-white/30 px-3 py-1 rounded-full text-white font-bold text-xs sm:text-sm">Nivel {getLevel(progress.lenguaje)}/5</span>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Lenguaje</h2>
-            <div className="w-full bg-white/20 h-4 rounded-full overflow-hidden">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Lenguaje</h2>
+            <div className="w-full bg-white/20 h-3 sm:h-4 rounded-full overflow-hidden">
               <div className="bg-white h-full transition-all duration-500" style={{ width: `${progress.lenguaje}%` }} />
             </div>
           </div>
@@ -448,15 +428,15 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
 
         <button 
           onClick={() => { soundService.playSFX('click'); onSelectLesson('matematicas'); }}
-          className="bg-[#F4E7B2] p-8 rounded-xl border-b-8 border-[#DDCF95] text-left chunky-button flex flex-col justify-between h-64 group"
+          className="bg-[#F4E7B2] p-6 sm:p-8 rounded-xl border-b-8 border-[#DDCF95] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
         >
           <div className="flex justify-between items-start">
-            <img src="/leon-matematicas.png" alt="Matemáticas" className="w-[93px] h-[93px] object-contain filter drop-shadow-md" />
-            <span className="bg-amber-800/10 px-3 py-1 rounded-full text-amber-900 font-bold text-sm">Nivel {getLevel(progress.matematicas)}/5</span>
+            <img src="/leon-matematicas.png" alt="Matemáticas" className="w-16 h-16 sm:w-[93px] sm:h-[93px] object-contain filter drop-shadow-md" />
+            <span className="bg-amber-800/10 px-3 py-1 rounded-full text-amber-900 font-bold text-xs sm:text-sm">Nivel {getLevel(progress.matematicas)}/5</span>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-amber-900 mb-2">Matemáticas</h2>
-            <div className="w-full bg-amber-800/10 h-4 rounded-full overflow-hidden">
+            <h2 className="text-xl sm:text-2xl font-bold text-amber-900 mb-2">Matemáticas</h2>
+            <div className="w-full bg-amber-800/10 h-3 sm:h-4 rounded-full overflow-hidden">
               <div className="bg-amber-600 h-full transition-all duration-500" style={{ width: `${progress.matematicas}%` }} />
             </div>
           </div>
@@ -464,15 +444,15 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
 
         <button 
           onClick={() => { soundService.playSFX('click'); onSelectLesson('historia'); }}
-          className="bg-[#BFD8C1] p-8 rounded-xl border-b-8 border-[#A6C0A8] text-left chunky-button flex flex-col justify-between h-64 group"
+          className="bg-[#BFD8C1] p-6 sm:p-8 rounded-xl border-b-8 border-[#A6C0A8] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
         >
           <div className="flex justify-between items-start">
-            <img src="/leon-historia.png" alt="Historia" className="w-[93px] h-[93px] object-contain filter drop-shadow-md" />
-            <span className="bg-green-800/10 px-3 py-1 rounded-full text-green-900 font-bold text-sm">Nivel {getLevel(progress.historia)}/5</span>
+            <img src="/leon-historia.png" alt="Historia" className="w-16 h-16 sm:w-[93px] sm:h-[93px] object-contain filter drop-shadow-md" />
+            <span className="bg-green-800/10 px-3 py-1 rounded-full text-green-900 font-bold text-xs sm:text-sm">Nivel {getLevel(progress.historia)}/5</span>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-green-900 mb-2">Historia</h2>
-            <div className="w-full bg-green-800/10 h-4 rounded-full overflow-hidden">
+            <h2 className="text-xl sm:text-2xl font-bold text-green-900 mb-2">Historia</h2>
+            <div className="w-full bg-green-800/10 h-3 sm:h-4 rounded-full overflow-hidden">
               <div className="bg-green-600 h-full transition-all duration-500" style={{ width: `${progress.historia}%` }} />
             </div>
           </div>
@@ -480,15 +460,15 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
 
         <button 
           onClick={() => { soundService.playSFX('click'); onSelectLesson('ciencias'); }}
-          className="bg-[#D8B4E2] p-8 rounded-xl border-b-8 border-[#BD9AC7] text-left chunky-button flex flex-col justify-between h-64 group"
+          className="bg-[#D8B4E2] p-6 sm:p-8 rounded-xl border-b-8 border-[#BD9AC7] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
         >
           <div className="flex justify-between items-start">
-            <img src="/leon-ciencias.png" alt="Ciencias" className="w-[93px] h-[93px] object-contain filter drop-shadow-md" />
-            <span className="bg-purple-800/10 px-3 py-1 rounded-full text-purple-900 font-bold text-sm">Nivel {getLevel(progress.ciencias || 0)}/5</span>
+            <img src="/leon-ciencias.png" alt="Ciencias" className="w-16 h-16 sm:w-[93px] sm:h-[93px] object-contain filter drop-shadow-md" />
+            <span className="bg-purple-800/10 px-3 py-1 rounded-full text-purple-900 font-bold text-xs sm:text-sm">Nivel {getLevel(progress.ciencias || 0)}/5</span>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-purple-900 mb-2">Ciencias</h2>
-            <div className="w-full bg-purple-800/10 h-4 rounded-full overflow-hidden">
+            <h2 className="text-xl sm:text-2xl font-bold text-purple-900 mb-2">Ciencias</h2>
+            <div className="w-full bg-purple-800/10 h-3 sm:h-4 rounded-full overflow-hidden">
               <div className="bg-purple-600 h-full transition-all duration-500" style={{ width: `${progress.ciencias || 0}%` }} />
             </div>
           </div>
@@ -557,6 +537,11 @@ const playAudioForKids = (text: string, onStart: () => void, onEnd: () => void) 
   }
 };
 
+interface LessonTask {
+  type: 'question' | 'calligraphy';
+  data: any;
+}
+
 const LessonView = ({ 
   category, 
   user, 
@@ -582,10 +567,10 @@ const LessonView = ({
   onBuyCoins: (amount: number) => void;
   onAnswerResult: (category: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias', correct: boolean) => void;
 }) => {
-  const [questions, setQuestions] = useState<GeneratedQuestion[] | null>(null);
+  const [tasks, setTasks] = useState<LessonTask[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [questionStep, setQuestionStep] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
@@ -595,27 +580,44 @@ const LessonView = ({
   const [isPlaying, setIsPlaying] = useState(false);
 
   React.useEffect(() => {
-    async function fetchQuestions() {
+    async function fetchContent() {
       try {
         setLoading(true);
-        const data = await generateLessonQuestions(category, user.age, user.grade);
-        setQuestions(data);
+        const questionData = await generateLessonQuestions(category, user.age, user.grade);
+        
+        const mixedTasks: LessonTask[] = [];
+        if (user.grade === '1ro básico' && category === 'lenguaje') {
+          // Mix questions and calligraphy
+          questionData.forEach((q, i) => {
+            mixedTasks.push({ type: 'question', data: q });
+            if (i === 1 || i === 3) {
+              // Extract a short word from the question or answer to practice
+              const words = q.answer.split(' ');
+              const wordToPractice = words.find(w => w.length > 2) || q.answer;
+              mixedTasks.push({ type: 'calligraphy', data: { word: wordToPractice } });
+            }
+          });
+        } else {
+          questionData.forEach(q => mixedTasks.push({ type: 'question', data: q }));
+        }
+        
+        setTasks(mixedTasks);
         setError(null);
       } catch (err) {
         console.error(err);
-        setError("¡Oh no! Leo tuvo un problema preparando tu aventura. Intenta de nuevo. Detalles: " + (err instanceof Error ? err.message : String(err)));
+        setError("¡Oh no! Leo tuvo un problema preparando tu aventura. Intenta de nuevo.");
       } finally {
         setLoading(false);
       }
     }
-    fetchQuestions();
+    fetchContent();
   }, [category, user.age, user.grade]);
 
-  const currentQuestion = questions ? questions[currentQuestionIndex] : null;
+  const currentTask = tasks ? tasks[currentTaskIndex] : null;
 
   const handleCheck = () => {
-    if (!selectedOption || !currentQuestion) return;
-    const isCorrect = selectedOption.toLowerCase() === currentQuestion.answer.toLowerCase();
+    if (!selectedOption || currentTask?.type !== 'question') return;
+    const isCorrect = selectedOption.toLowerCase() === currentTask.data.answer.toLowerCase();
     onAnswerResult(category, isCorrect);
     if (isCorrect) {
       soundService.playSFX('correct');
@@ -629,9 +631,9 @@ const LessonView = ({
 
   const handleNext = () => {
     soundService.playSFX('click');
-    if (!questions) return;
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    if (!tasks) return;
+    if (currentTaskIndex < tasks.length - 1) {
+      setCurrentTaskIndex(currentTaskIndex + 1);
       setQuestionStep(false);
       setSelectedOption(null);
       setFeedback(null);
@@ -641,10 +643,16 @@ const LessonView = ({
     }
   };
 
+  const handleCalligraphySubFinish = (success: boolean) => {
+    if (success) {
+      handleNext();
+    }
+  };
+
   const handlePlayAudio = () => {
-    if (!currentQuestion) return;
+    if (currentTask?.type !== 'question') return;
     playAudioForKids(
-      currentQuestion.text,
+      currentTask.data.text,
       () => setIsPlaying(true),
       () => setIsPlaying(false)
     );
@@ -664,7 +672,7 @@ const LessonView = ({
 
   if (loading) {
     return (
-      <main className="pt-32 px-6 text-center max-w-xl mx-auto flex flex-col items-center gap-8">
+      <main className="pt-20 sm:pt-32 px-6 text-center max-w-xl mx-auto flex flex-col items-center gap-8">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -683,9 +691,9 @@ const LessonView = ({
     );
   }
 
-  if (error || !questions) {
+  if (error || !tasks) {
     return (
-      <main className="pt-32 px-6 text-center max-w-xl mx-auto flex flex-col items-center gap-6">
+      <main className="pt-20 sm:pt-32 px-6 text-center max-w-xl mx-auto flex flex-col items-center gap-6">
         <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center">
             <Lock className="w-12 h-12 text-red-500" />
         </div>
@@ -700,7 +708,7 @@ const LessonView = ({
   if (isFinished) {
     if (hasMistake) {
       return (
-        <main className="pt-32 px-6 text-center max-w-xl mx-auto relative">
+        <main className="pt-20 sm:pt-32 px-6 text-center max-w-xl mx-auto relative pb-24 sm:pb-32">
            {showShopModal && (
              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
                 <div className="bg-white p-8 rounded-3xl max-w-sm w-full border-4 border-surface-container shadow-xl text-center">
@@ -734,7 +742,7 @@ const LessonView = ({
                 if (coins >= 20) {
                   onModifyCoins(-20);
                   setHasMistake(false);
-                  setCurrentQuestionIndex(0);
+                  setCurrentTaskIndex(0);
                   setQuestionStep(false);
                   setSelectedOption(null);
                   setFeedback(null);
@@ -752,7 +760,7 @@ const LessonView = ({
                 // Simulate watching an ad
                 alert("Simulando: Viendo publicidad... ¡Felicidades! Has desbloqueado el nivel.");
                 setHasMistake(false);
-                setCurrentQuestionIndex(0);
+                setCurrentTaskIndex(0);
                 setQuestionStep(false);
                 setSelectedOption(null);
                 setFeedback(null);
@@ -774,8 +782,8 @@ const LessonView = ({
     }
 
     return (
-      <main className="pt-32 px-6 text-center max-w-xl mx-auto">
-        <div className="w-40 h-40 bg-secondary-container rounded-full mx-auto mb-8 flex items-center justify-center border-4 border-secondary">
+      <main className="pt-20 sm:pt-32 px-6 text-center max-w-xl mx-auto pb-24 sm:pb-32">
+        <div className="w-24 h-24 sm:w-40 sm:h-40 bg-secondary-container rounded-full mx-auto mb-8 flex items-center justify-center border-4 border-secondary">
           <Check className="w-20 h-20 text-secondary" />
         </div>
         <h1 className="text-4xl font-extrabold text-primary mb-4">¡Nivel Completado!</h1>
@@ -790,19 +798,40 @@ const LessonView = ({
     );
   }
 
+  if (currentTask?.type === 'calligraphy') {
+    return (
+      <div className="pt-16 sm:pt-20">
+        <CalligraphyView 
+          onBack={onBack}
+          onFinish={handleCalligraphySubFinish}
+          wordToCopy={currentTask.data?.word}
+        />
+      </div>
+    );
+  }
+
+  const currentQuestion = currentTask?.data as GeneratedQuestion;
+
+  const categoryLabels = {
+    lenguaje: 'Lenguaje',
+    matematicas: 'Matemáticas',
+    historia: 'Historia',
+    ciencias: 'Ciencias'
+  };
+
   return (
-    <main className="pt-24 pb-32 px-6 max-w-2xl mx-auto min-h-screen flex flex-col gap-6">
+    <main className="pt-20 sm:pt-24 pb-24 sm:pb-32 px-4 sm:px-6 max-w-2xl mx-auto min-h-screen flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2">
         <button onClick={() => { soundService.playSFX('click'); onBack(); }} className="p-2 bg-surface-container rounded-full text-primary hover:bg-surface-container-high transition-colors shrink-0">
           <ArrowLeft className="w-6 h-6" />
         </button>
-        <div className="bg-primary-container text-on-primary-container px-4 py-2 rounded-full font-bold border-b-4 border-primary capitalize text-sm sm:text-base text-center truncate">
-          {category} <span className="hidden sm:inline">· Pregunta</span> {currentQuestionIndex + 1}
+        <div className="bg-primary-container text-on-primary-container px-4 py-2 rounded-full font-bold border-b-4 border-primary text-sm sm:text-base text-center truncate">
+          {categoryLabels[category]} <span className="hidden sm:inline">· Pregunta</span> {currentTaskIndex + 1}
         </div>
-        <div className="font-bold text-on-surface-variant text-sm sm:text-base shrink-0">{currentQuestionIndex + 1} de 5</div>
+        <div className="font-bold text-on-surface-variant text-sm sm:text-base shrink-0">{currentTaskIndex + 1} de {tasks.length}</div>
       </div>
 
-      <div className="w-full bg-white rounded-2xl border-4 border-surface-container p-8 shadow-sm">
+      <div className="w-full bg-white rounded-2xl border-4 border-surface-container p-4 sm:p-8 shadow-sm">
         <p className="text-2xl font-medium text-on-surface leading-normal">
           {currentQuestion.text}
         </p>
@@ -956,7 +985,7 @@ const LessonView = ({
                   onClick={handleNext}
                   className="w-full h-16 rounded-full font-bold text-xl chunky-button flex items-center justify-center gap-2 bg-primary text-white chunky-shadow-primary"
                 >
-                  {currentQuestionIndex === questions.length - 1 ? 'Terminar' : 'Siguiente'}
+                  {currentTaskIndex === tasks.length - 1 ? 'Terminar' : 'Siguiente'}
                   <ArrowRight className="w-6 h-6" />
                 </button>
               </div>
@@ -985,7 +1014,7 @@ const ShopView = ({ onBuyCoins, onBack }: { onBuyCoins: (amount: number) => void
   ];
 
   return (
-    <main className="pt-28 pb-40 px-6 max-w-4xl mx-auto min-h-screen">
+    <main className="pt-20 sm:pt-28 pb-24 sm:pb-40 px-6 max-w-4xl mx-auto min-h-screen">
       <section className="mb-8 text-center relative flex items-center justify-center">
         {onBack && (
           <button onClick={() => { soundService.playSFX('click'); onBack(); }} className="absolute left-0 p-2 bg-surface-container rounded-full text-primary hover:bg-surface-container-high transition-colors">
@@ -1303,13 +1332,13 @@ export default function App() {
               onBuyCoins={handleBuyCoins}
               onAnswerResult={handleAnswerResult}
             />
-          )}  
+          )}
           {state.view === 'calligraphy' && (
             <CalligraphyView 
               onBack={() => setState({ ...state, view: 'map', activeCategory: null })}
               onFinish={handleFinishLesson}
             />
-          )}  
+          )}
           {state.view === 'shop' && state.returnToView !== 'lesson' && (
             <ShopView 
               onBuyCoins={handleBuyCoins} 
@@ -1325,8 +1354,13 @@ export default function App() {
               progress={state.categoryProgress} 
               overall={state.progress} 
               initialCategory={state.activeCategory || 'lenguaje'}
-              onStartLesson={(cat) => setState({...state, view: 'lesson', activeCategory: cat})}
-              onGoToCalligraphy={() => setState({...state, view: 'calligraphy'})}
+              onStartLesson={(cat, levelIndex) => {
+                if (state.user?.grade === '1ro básico' && cat === 'lenguaje' && (levelIndex % 2 === 0)) {
+                  setState({...state, view: 'calligraphy', activeCategory: cat});
+                } else {
+                  setState({...state, view: 'lesson', activeCategory: cat});
+                }
+              }}
             />
           )}
           {state.view === 'parents' && state.user && (
@@ -1346,7 +1380,7 @@ export default function App() {
   );
 }
 
-const ProgressView = ({ user, coins, progress, overall, initialCategory, onStartLesson, onGoToCalligraphy }: { user: UserProfile; coins: number; progress: CategoryProgress; overall: number; initialCategory: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias'; onStartLesson: (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias') => void; onGoToCalligraphy: () => void;}) => {
+const ProgressView = ({ user, coins, progress, overall, initialCategory, onStartLesson }: { user: UserProfile; coins: number; progress: CategoryProgress; overall: number; initialCategory: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias'; onStartLesson: (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias', levelIndex: number) => void; }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<'lenguaje' | 'matematicas' | 'historia' | 'ciencias'>(initialCategory || 'lenguaje');
 
@@ -1361,7 +1395,7 @@ const ProgressView = ({ user, coins, progress, overall, initialCategory, onStart
   const currentLevelsCompleted = Math.floor(currentCategory.value / 20);
 
   return (
-    <main className="pt-28 pb-40 px-6 max-w-4xl mx-auto min-h-screen relative">
+    <main className="pt-20 sm:pt-28 pb-24 sm:pb-40 px-4 sm:px-6 max-w-4xl mx-auto min-h-screen relative">
       {/* Floating Profile Widget */}
       <div className="fixed bottom-28 right-6 z-40 flex flex-col items-end">
         <AnimatePresence>
@@ -1539,7 +1573,7 @@ const ProgressView = ({ user, coins, progress, overall, initialCategory, onStart
                   onClick={() => {
                     if (isCurrent) {
                       soundService.playSFX('click');
-                      onStartLesson(currentCategory.id as any);
+                      onStartLesson(currentCategory.id as any, i);
                     }
                   }}
                   className={`w-16 h-16 rounded-3xl rotate-45 border-4 flex items-center justify-center relative ${
@@ -1615,8 +1649,8 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
   };
 
   return (
-    <main className="pt-28 pb-40 px-6 max-w-5xl mx-auto min-h-screen relative">
-      <section className="mb-10 flex items-center justify-between">
+    <main className="pt-20 sm:pt-28 pb-24 sm:pb-40 px-6 max-w-5xl mx-auto min-h-screen relative">
+      <section className="mb-6 sm:mb-10 flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-extrabold text-primary mb-2">Panel de Tutores</h1>
           <p className="text-xl text-on-surface-variant">Estadísticas y progreso de {user.name}</p>
@@ -1725,26 +1759,6 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
           </div>
         </div>
       </div>
-      {activeCategory === 'lenguaje' && (
-  <div className="mb-8 p-6 bg-primary-fixed rounded-3xl border-4 border-primary-container flex flex-col sm:flex-row items-center gap-6 shadow-[0_6px_0_0_#a9c9d9]">
-    <div className="w-20 h-20 shrink-0 bg-white rounded-2xl flex items-center justify-center border-4 border-primary-container shadow-inner">
-      <span className="text-4xl">✏️</span>
-    </div>
-    <div className="flex-1 text-center sm:text-left">
-      <span className="inline-block bg-primary text-white text-xs font-bold px-3 py-1 rounded-full mb-2 uppercase tracking-wider">
-        ¡Actividad especial!
-      </span>
-      <h3 className="text-2xl font-extrabold text-on-primary-container mb-1">Práctica de Caligrafía</h3>
-      <p className="text-on-primary-container/80 font-medium">Traza palabras y mejora tu escritura con Leo.</p>
-    </div>
-    <button
-      onClick={() => { soundService.playSFX('click'); onGoToCalligraphy(); }}
-      className="shrink-0 bg-primary text-white font-bold text-lg px-8 py-4 rounded-full chunky-button chunky-shadow-primary whitespace-nowrap"
-    >
-      ¡Practicar!
-    </button>
-  </div>
-)}
     </main>
   );
 };
