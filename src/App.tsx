@@ -1326,6 +1326,7 @@ export default function App() {
               overall={state.progress} 
               initialCategory={state.activeCategory || 'lenguaje'}
               onStartLesson={(cat) => setState({...state, view: 'lesson', activeCategory: cat})}
+              onGoToCalligraphy={() => setState({...state, view: 'calligraphy'})}
             />
           )}
           {state.view === 'parents' && state.user && (
@@ -1345,7 +1346,7 @@ export default function App() {
   );
 }
 
-const ProgressView = ({ user, coins, progress, overall, initialCategory, onStartLesson }: { user: UserProfile; coins: number; progress: CategoryProgress; overall: number; initialCategory: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias'; onStartLesson: (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias') => void; }) => {
+const ProgressView = ({ user, coins, progress, overall, initialCategory, onStartLesson, onGoToCalligraphy }: { user: UserProfile; coins: number; progress: CategoryProgress; overall: number; initialCategory: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias'; onStartLesson: (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias') => void; onGoToCalligraphy: () => void;}) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<'lenguaje' | 'matematicas' | 'historia' | 'ciencias'>(initialCategory || 'lenguaje');
 
