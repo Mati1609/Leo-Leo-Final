@@ -1725,7 +1725,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
           </div>
         </div>
       </div>
-      {activeCategory === 'lenguaje' && user.grade === '1ro básico' && (
+      {activeCategory === 'lenguaje' && (
   <div className="mb-8 p-6 bg-primary-fixed rounded-3xl border-4 border-primary-container flex flex-col sm:flex-row items-center gap-6 shadow-[0_6px_0_0_#a9c9d9]">
     <div className="w-20 h-20 shrink-0 bg-white rounded-2xl flex items-center justify-center border-4 border-primary-container shadow-inner">
       <span className="text-4xl">✏️</span>
