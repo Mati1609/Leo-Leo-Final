@@ -9,6 +9,17 @@ import { motion } from 'motion/react';
 interface DanceBreakViewProps {
   onFinish: () => void;
 }
+
+const PETS = [
+  '/leon-lenguaje.png',
+  '/leon-matematicas.png',
+  '/leon-historia.png',
+  '/leon-ciencias.png',
+  '/leon base.png',
+  '/puma.png',
+  '/panda.png',
+  '/tigre.png'
+];
  
 export const DanceBreakView = ({ onFinish }: DanceBreakViewProps) => {
   const [countdown, setCountdown] = useState(12);
