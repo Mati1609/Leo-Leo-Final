@@ -81,29 +81,29 @@ const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, class
         'Humita': { bottom: '15%', width: '28%', left: '36%', zIndex: 20 }
       },
       puma: {
-        'Sombrero': { top: '-2%', width: '52%', left: '24%', zIndex: 20 },
-        'Corona': { top: '0%', width: '36%', left: '32%', zIndex: 20 },
-        'Lentes claros': { top: '32%', width: '48%', left: '26%', zIndex: 25 },
-        'Lentes oscuros': { top: '32%', width: '48%', left: '26%', zIndex: 25 },
-        'Bufanda': { bottom: '4%', width: '54%', left: '23%', zIndex: 20 },
-        'Humita': { bottom: '14%', width: '26%', left: '37%', zIndex: 20 }
+        'Sombrero': { top: '3%', width: '58%', left: '21%', zIndex: 20 },
+        'Corona': { top: '3%', width: '38%', left: '31%', zIndex: 20 },
+        'Lentes claros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
+        'Lentes oscuros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
+        'Bufanda': { bottom: '5%', width: '56%', left: '22%', zIndex: 20 },
+        'Humita': { bottom: '15%', width: '28%', left: '36%', zIndex: 20 }
       },
       panda: {
-        'Sombrero': { top: '4%', width: '54%', left: '23%', zIndex: 20 },
-        'Corona': { top: '5%', width: '36%', left: '32%', zIndex: 20 },
-        'Lentes claros': { top: '35%', width: '48%', left: '26%', zIndex: 25 },
-        'Lentes oscuros': { top: '35%', width: '48%', left: '26%', zIndex: 25 },
-        'Bufanda': { bottom: '6%', width: '54%', left: '23%', zIndex: 20 },
-        'Humita': { bottom: '16%', width: '26%', left: '37%', zIndex: 20 }
+        'Sombrero': { top: '3%', width: '58%', left: '21%', zIndex: 20 },
+        'Corona': { top: '3%', width: '38%', left: '31%', zIndex: 20 },
+        'Lentes claros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
+        'Lentes oscuros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
+        'Bufanda': { bottom: '5%', width: '56%', left: '22%', zIndex: 20 },
+        'Humita': { bottom: '15%', width: '28%', left: '36%', zIndex: 20 }
       },
       tigre: {
-        'Sombrero': { top: '2%', width: '56%', left: '22%', zIndex: 20 },
+        'Sombrero': { top: '3%', width: '58%', left: '21%', zIndex: 20 },
         'Corona': { top: '3%', width: '38%', left: '31%', zIndex: 20 },
-        'Lentes claros': { top: '34%', width: '50%', left: '25%', zIndex: 25 },
-        'Lentes oscuros': { top: '34%', width: '50%', left: '25%', zIndex: 25 },
-        'Bufanda': { bottom: '5%', width: '54%', left: '23%', zIndex: 20 },
-        'Humita': { bottom: '15%', width: '26%', left: '37%', zIndex: 20 }
-      }
+        'Lentes claros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
+        'Lentes oscuros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
+        'Bufanda': { bottom: '5%', width: '56%', left: '22%', zIndex: 20 },
+        'Humita': { bottom: '15%', width: '28%', left: '36%', zIndex: 20 }
+      },
     };
 
     const charConfig = configMap[charId] || configMap.leon;
