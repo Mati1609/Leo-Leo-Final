@@ -128,5 +128,3 @@ export const DanceBreakView = ({ onFinish }: DanceBreakViewProps) => {
 };
  
 export default DanceBreakView;
- 
-};
