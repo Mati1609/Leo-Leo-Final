@@ -99,10 +99,10 @@ const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, class
       tigre: {
         'Sombrero': { top: '-2%', width: '58%', left: '16%', zIndex: 20 },
         'Corona': { top: '-2%', width: '38%', left: '25%', zIndex: 20 },
-        'Lentes claros': { top: '32%', width: '52%', left: '20%', zIndex: 25 },
-        'Lentes oscuros': { top: '32%', width: '52%', left: '20%', zIndex: 25 },
-        'Bufanda': { bottom: '5%', width: '56%', left: '17%', zIndex: 20 },
-        'Humita': { bottom: '20%', width: '28%', left: '34%', zIndex: 20 }
+        'Lentes claros': { top: '32%', width: '52%', left: '17%', zIndex: 25 },
+        'Lentes oscuros': { top: '32%', width: '52%', left: '17%', zIndex: 25 },
+        'Bufanda': { bottom: '7%', width: '56%', left: '17%', zIndex: 20 },
+        'Humita': { bottom: '20%', width: '28%', left: '32%', zIndex: 20 }
       },
     };
 
