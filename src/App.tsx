@@ -27,6 +27,8 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Map as MapIcon,
   Clock,
   TrendingUp,
@@ -51,28 +53,112 @@ import {
 } from 'recharts';
 import { AppState, AppView, UserProfile, CategoryProgress, AvatarConfig } from './types.ts';
 import { generateLessonQuestions, GeneratedQuestion } from './services/geminiService';
-import { CalligraphyView } from './CalligraphyView';
+import { CalligraphyView } from './components/CalligraphyView';
+import { DanceBreakView } from './components/DanceBreakView';
 
 // --- Components ---
+
+export const AVAILABLE_CHARACTERS = [
+  { id: 'leon', name: 'Leo', file: '/leon base.png' },
+  { id: 'puma', name: 'Kai', file: '/puma.png' },
+  { id: 'panda', name: 'Pipo', file: '/panda.png' },
+  { id: 'tigre', name: 'Tino', file: '/tigre.png' }
+];
 
 const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, className?: string }) => {
   const [imageError, setImageError] = useState(false);
   
   if (!config) return <div className={`flex items-center justify-center bg-surface-container ${className}`}><img src="/logo.png" referrerPolicy="no-referrer" alt="Leo" className="w-[80%] h-[80%] object-contain" /></div>;
   
+  const getAccessoryStyle = (accName: string, charId: string): React.CSSProperties => {
+    const configMap: Record<string, Record<string, React.CSSProperties>> = {
+      leon: {
+        'Sombrero': { top: '3%', width: '58%', left: '21%', zIndex: 20 },
+        'Corona': { top: '3%', width: '38%', left: '31%', zIndex: 20 },
+        'Lentes claros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
+        'Lentes oscuros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
+        'Bufanda': { bottom: '5%', width: '56%', left: '22%', zIndex: 20 },
+        'Humita': { bottom: '15%', width: '28%', left: '36%', zIndex: 20 }
+      },
+      puma: {
+        'Sombrero': { top: '-2%', width: '52%', left: '24%', zIndex: 20 },
+        'Corona': { top: '0%', width: '36%', left: '32%', zIndex: 20 },
+        'Lentes claros': { top: '32%', width: '48%', left: '26%', zIndex: 25 },
+        'Lentes oscuros': { top: '32%', width: '48%', left: '26%', zIndex: 25 },
+        'Bufanda': { bottom: '4%', width: '54%', left: '23%', zIndex: 20 },
+        'Humita': { bottom: '14%', width: '26%', left: '37%', zIndex: 20 }
+      },
+      panda: {
+        'Sombrero': { top: '4%', width: '54%', left: '23%', zIndex: 20 },
+        'Corona': { top: '5%', width: '36%', left: '32%', zIndex: 20 },
+        'Lentes claros': { top: '35%', width: '48%', left: '26%', zIndex: 25 },
+        'Lentes oscuros': { top: '35%', width: '48%', left: '26%', zIndex: 25 },
+        'Bufanda': { bottom: '6%', width: '54%', left: '23%', zIndex: 20 },
+        'Humita': { bottom: '16%', width: '26%', left: '37%', zIndex: 20 }
+      },
+      tigre: {
+        'Sombrero': { top: '2%', width: '56%', left: '22%', zIndex: 20 },
+        'Corona': { top: '3%', width: '38%', left: '31%', zIndex: 20 },
+        'Lentes claros': { top: '34%', width: '50%', left: '25%', zIndex: 25 },
+        'Lentes oscuros': { top: '34%', width: '50%', left: '25%', zIndex: 25 },
+        'Bufanda': { bottom: '5%', width: '54%', left: '23%', zIndex: 20 },
+        'Humita': { bottom: '15%', width: '26%', left: '37%', zIndex: 20 }
+      }
+    };
+
+    const charConfig = configMap[charId] || configMap.leon;
+    return charConfig[accName] || { top: '0%', width: '50%', left: '25%', zIndex: 20 };
+  };
+
+  const getAccessoryFile = (accName: string) => {
+    switch (accName) {
+      case 'Sombrero': return '/Sombrero.png';
+      case 'Corona': return '/Corona.png';
+      case 'Lentes claros': return '/Lentes claros.png';
+      case 'Lentes oscuros': return '/Lentes oscuros.png';
+      case 'Bufanda': return '/Bufanda.png';
+      case 'Humita': return '/Humita.png';
+      default: return '';
+    }
+  };
+
+  const accessoryFile = config.accessory ? getAccessoryFile(config.accessory) : '';
+  const characterId = config.character || 'leon';
+  const characterObj = AVAILABLE_CHARACTERS.find(c => c.id === characterId) || AVAILABLE_CHARACTERS[0];
+
   return (
     <div className={`@container relative flex items-center justify-center ${config.color} ${className} overflow-visible`}>
-      <div className="relative inline-flex items-center justify-center w-full h-full">
+      <div 
+        className="relative w-[90%] h-[90%] flex items-center justify-center overflow-visible"
+        style={{
+          transform: characterId === 'puma' ? 'translateX(5%)' :
+                     characterId === 'panda' ? 'translateX(4.2%)' :
+                     characterId === 'tigre' ? 'translateX(3.8%)' : 'none'
+        }}
+      >
         {!imageError ? (
           <img 
-            src="/leon base.png" 
-            alt="Leo" 
-            className="w-[90%] h-[90%] object-contain z-10"
+            key={characterId}
+            src={characterObj.file} 
+            alt={characterObj.name} 
+            className="w-full h-full object-contain z-10"
             onError={() => setImageError(true)}
             referrerPolicy="no-referrer"
           />
         ) : (
           <span className="text-primary font-black z-10 leading-none" style={{fontSize: '20cqw'}}>LEO</span>
+        )}
+        
+        {/* Accessory Overlay */}
+        {!imageError && accessoryFile && (
+          <img 
+            key={config.accessory}
+            src={accessoryFile} 
+            alt={config.accessory} 
+            className="absolute object-contain pointer-events-none animate-fade-in" 
+            style={getAccessoryStyle(config.accessory, characterId)}
+            referrerPolicy="no-referrer"
+          />
         )}
       </div>
     </div>
@@ -222,10 +308,72 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
     parentEmail: '',
     avatar: { emoji: '🦁', color: 'bg-orange-200', accessory: '' }
   });
+  const [confetti, setConfetti] = useState<{ id: number; x: number; y: number; scale: number; color: string; rotate: number }[]>([]);
+
+  const handlePrevCharacter = () => {
+    soundService.playSFX('click');
+    const currentIndex = AVAILABLE_CHARACTERS.findIndex(c => c.id === (form.avatar.character || 'leon'));
+    const prevIndex = (currentIndex - 1 + AVAILABLE_CHARACTERS.length) % AVAILABLE_CHARACTERS.length;
+    const prevChar = AVAILABLE_CHARACTERS[prevIndex];
+    setForm(prev => ({
+      ...prev,
+      avatar: {
+        ...prev.avatar,
+        character: prevChar.id,
+        emoji: prevChar.id === 'leon' ? '🦁' : prevChar.id === 'puma' ? '🐈' : prevChar.id === 'panda' ? '🐼' : '🐯'
+      }
+    }));
+  };
+
+  const handleNextCharacter = () => {
+    soundService.playSFX('click');
+    const currentIndex = AVAILABLE_CHARACTERS.findIndex(c => c.id === (form.avatar.character || 'leon'));
+    const nextIndex = (currentIndex + 1) % AVAILABLE_CHARACTERS.length;
+    const nextChar = AVAILABLE_CHARACTERS[nextIndex];
+    setForm(prev => ({
+      ...prev,
+      avatar: {
+        ...prev.avatar,
+        character: nextChar.id,
+        emoji: nextChar.id === 'leon' ? '🦁' : nextChar.id === 'puma' ? '🐈' : nextChar.id === 'panda' ? '🐼' : '🐯'
+      }
+    }));
+  };
+
+  const handleSelectAccessory = (accId: string) => {
+    soundService.playSFX('click');
+    setForm(prev => ({ ...prev, avatar: { ...prev.avatar, accessory: accId } }));
+    
+    if (accId) {
+      // Trigger festive confetti!
+      const colors = ['#FFC107', '#FF4081', '#00E676', '#29B6F6', '#AB47BC', '#FF7043', '#FFEB3B'];
+      const particles = Array.from({ length: 35 }).map((_, i) => ({
+        id: Date.now() + i,
+        x: (Math.random() - 0.5) * 250, // spread left/right
+        y: -40 - Math.random() * 160,    // shoot up
+        scale: 0.6 + Math.random() * 0.8,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotate: Math.random() * 360
+      }));
+      setConfetti(particles);
+      // Clear after animation ends
+      setTimeout(() => {
+        setConfetti([]);
+      }, 1500);
+    }
+  };
 
   const avatars = ['🦁'];
   const avatarColors = ['bg-orange-200', 'bg-blue-200', 'bg-green-200', 'bg-purple-200', 'bg-yellow-200', 'bg-pink-200'];
-  const accessories = ['', '', '', '', ''];
+  const accessories = [
+    { id: '', label: 'Ninguno', emoji: '❌' },
+    { id: 'Sombrero', label: 'Sombrero', emoji: '🎩' },
+    { id: 'Corona', label: 'Corona', emoji: '👑' },
+    { id: 'Lentes claros', label: 'Claros', emoji: '👓' },
+    { id: 'Lentes oscuros', label: 'Oscuros', emoji: '🕶️' },
+    { id: 'Bufanda', label: 'Bufanda', emoji: '🧣' },
+    { id: 'Humita', label: 'Humita', emoji: '🎀' }
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -274,7 +422,7 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
                 value={form.name}
                 onChange={e => setForm({...form, name: e.target.value})}
                 required
-                className="w-full min-h-[56px] rounded-lg bg-white border-primary-container border-2 focus:border-primary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#a9c9d9]"
+                className="w-full min-h-[56px] rounded-2xl bg-white border-primary-container border-2 focus:border-primary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#a9c9d9]"
                 placeholder="¿Cómo te llamas?" 
               />
             </div>
@@ -284,7 +432,7 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
                 value={form.lastName}
                 onChange={e => setForm({...form, lastName: e.target.value})}
                 required
-                className="w-full min-h-[56px] rounded-lg bg-white border-primary-container border-2 focus:border-primary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#a9c9d9]"
+                className="w-full min-h-[56px] rounded-2xl bg-white border-primary-container border-2 focus:border-primary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#a9c9d9]"
                 placeholder="Tu apellido" 
               />
             </div>
@@ -303,7 +451,7 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
                     const val = parseInt(e.target.value);
                     setForm({...form, age: Number.isNaN(val) ? 0 : val});
                   }}
-                  className="w-full min-h-[56px] rounded-lg bg-white border-tertiary-container border-2 focus:border-tertiary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#d0c492]"
+                  className="w-full min-h-[56px] rounded-2xl bg-white border-tertiary-container border-2 focus:border-tertiary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#d0c492]"
                 />
                 <Cake className="absolute right-4 top-1/2 -translate-y-1/2 text-tertiary w-5 h-5 -mr-[10px] m-0 pr-0" />
               </div>
@@ -313,7 +461,7 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
               <select 
                 value={form.grade}
                 onChange={e => setForm({...form, grade: e.target.value})}
-                className="w-full min-h-[56px] rounded-lg bg-white border-tertiary-container border-2 focus:border-tertiary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#d0c492] appearance-none"
+                className="w-full min-h-[56px] rounded-2xl bg-white border-tertiary-container border-2 focus:border-tertiary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#d0c492] appearance-none"
               >
                 <option>1ro básico</option>
                 <option>2do básico</option>
@@ -328,8 +476,67 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
           <div className="space-y-6">
             <div className="flex flex-col items-center gap-4">
               <label className="font-bold text-on-surface-variant px-2">¡Arma tu avatar!</label>
-              <div className="flex justify-center border-4 border-surface-dim rounded-[32px] p-4 bg-surface-container shadow-inner">
-                <AvatarDisplay config={form.avatar} className="w-48 h-48 sm:w-64 sm:h-64 rounded-3xl" />
+              
+              <div className="flex items-center gap-4 sm:gap-6 w-full max-w-sm justify-center">
+                {/* Ant/Prev Character Arrow */}
+                <button
+                  type="button"
+                  onClick={handlePrevCharacter}
+                  className="chunky-button w-12 h-12 rounded-2xl bg-surface-container text-on-surface hover:bg-surface-container-high border-2 border-outline-variant/30 flex items-center justify-center transition-all shadow-[0_4px_0_0_#bbbbbb] active:translate-y-1 active:shadow-none"
+                  title="Anterior personaje"
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </button>
+
+                <div className="flex justify-center border-4 border-surface-dim rounded-[32px] p-4 bg-surface-container shadow-inner relative overflow-visible">
+                  <AvatarDisplay config={form.avatar} className="w-48 h-48 sm:w-64 sm:h-64 rounded-3xl" />
+                  
+                  {/* Confetti Explosion Layer */}
+                  {confetti.map((particle) => (
+                    <motion.div
+                      key={particle.id}
+                      initial={{ x: 0, y: 0, scale: 0, rotate: 0, opacity: 1 }}
+                      animate={{
+                        x: particle.x,
+                        y: particle.y,
+                        scale: particle.scale,
+                        rotate: particle.rotate,
+                        opacity: [1, 1, 0]
+                      }}
+                      transition={{
+                        duration: 1.2,
+                        ease: "easeOut"
+                      }}
+                      className="absolute pointer-events-none rounded-[4px] shadow-[0_2px_4px_rgba(0,0,0,0.1)]"
+                      style={{
+                        width: '12px',
+                        height: '12px',
+                        backgroundColor: particle.color,
+                        top: '55%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        zIndex: 35
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Next Character Arrow */}
+                <button
+                  type="button"
+                  onClick={handleNextCharacter}
+                  className="chunky-button w-12 h-12 rounded-2xl bg-surface-container text-on-surface hover:bg-surface-container-high border-2 border-outline-variant/30 flex items-center justify-center transition-all shadow-[0_4px_0_0_#bbbbbb] active:translate-y-1 active:shadow-none"
+                  title="Siguiente personaje"
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </button>
+              </div>
+
+              {/* Character name label */}
+              <div className="bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20">
+                <span className="font-extrabold text-primary text-sm uppercase tracking-wider">
+                  {AVAILABLE_CHARACTERS.find(c => c.id === (form.avatar.character || 'leon'))?.name}
+                </span>
               </div>
             </div>
 
@@ -350,21 +557,26 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
             </div>
 
             <div className="space-y-3">
-              <label className="font-bold text-sm text-on-surface-variant px-2 uppercase tracking-wider">Accesorio (Próximamente)</label>
-              <div className="flex justify-center gap-3 opacity-60">
-                {accessories.map(acc => (
-                  <button
-                    key={acc || 'none'}
-                    type="button"
-                    onClick={() => { 
-                      soundService.playSFX('click');
-                      // Non-functional: don't update state
-                    }}
-                    className={`text-3xl w-14 h-14 rounded-2xl flex items-center justify-center transition-all chunky-button bg-surface-container border-2 border-outline-variant/30 hover:bg-surface-container-high`}
-                  >
-                    {/* Empty slots for non-functional accessories */}
-                  </button>
-                ))}
+              <label className="font-bold text-sm text-on-surface-variant px-2 uppercase tracking-wider">Elegir Accesorio</label>
+              <div className="flex justify-center gap-2 flex-wrap pb-2">
+                {accessories.map((acc) => {
+                  const isActive = form.avatar.accessory === acc.id;
+                  return (
+                    <button
+                      key={acc.id}
+                      type="button"
+                      onClick={() => handleSelectAccessory(acc.id)}
+                      className={`text-2xl w-14 h-14 rounded-2xl flex flex-col items-center justify-center transition-all chunky-button ${
+                        isActive 
+                          ? 'bg-primary text-white border-primary shadow-[0_4px_0_0_#2c4b58] scale-110' 
+                          : 'bg-surface-container text-on-surface border-2 border-outline-variant/30 hover:bg-surface-container-high'
+                      }`}
+                      title={acc.label}
+                    >
+                      <span>{acc.emoji}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -378,7 +590,7 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
               value={form.parentEmail}
               onChange={e => setForm({...form, parentEmail: e.target.value})}
               required
-              className="w-full min-h-[56px] rounded-lg bg-white border-secondary-container border-2 focus:border-secondary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#d0e9d1]"
+              className="w-full min-h-[56px] rounded-2xl bg-white border-secondary-container border-2 focus:border-secondary focus:ring-0 px-6 text-lg shadow-[0_4px_0_0_#d0e9d1]"
               placeholder="papa@ejemplo.com" 
             />
             <p className="text-on-surface-variant/70 text-sm px-2 italic">para que podamos terminar de configurar</p>
@@ -399,8 +611,9 @@ const RegistrationView = ({ onComplete }: { onComplete: (profile: UserProfile) =
   );
 };
 
-const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: CategoryProgress; onSelectLesson: (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias') => void; onViewShop: () => void }) => {
+const AdventureMapView = ({ progress, unlockedCategories, onSelectLesson, onViewShop, onUnlockCategory, coins }: { progress: CategoryProgress; unlockedCategories: string[]; onSelectLesson: (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias' | 'musica') => void; onViewShop: () => void; onUnlockCategory: (cat: string) => void; coins: number; }) => {
   const getLevel = (p: number) => Math.floor(p / 20); // 100 / 5 = 20% per level
+  const [showUnlockModal, setShowUnlockModal] = React.useState(false);
 
   return (
     <main className="pt-20 sm:pt-28 pb-24 sm:pb-32 px-6 max-w-4xl mx-auto min-h-screen">
@@ -412,7 +625,7 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         <button 
           onClick={() => { soundService.playSFX('click'); onSelectLesson('lenguaje'); }}
-          className="bg-[#A9C9D9] p-6 sm:p-8 rounded-xl border-b-8 border-[#8FB6C6] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group relative overflow-hidden"
+          className="bg-[#A9C9D9] p-6 sm:p-8 rounded-3xl border-b-[12px] border-[#8FB6C6] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group relative overflow-hidden"
         >
           <div className="flex justify-between items-start">
             <img src="/leon-lenguaje.png" alt="Lenguaje" className="w-16 h-16 sm:w-[93px] sm:h-[93px] object-contain filter drop-shadow-md" />
@@ -428,7 +641,7 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
 
         <button 
           onClick={() => { soundService.playSFX('click'); onSelectLesson('matematicas'); }}
-          className="bg-[#F4E7B2] p-6 sm:p-8 rounded-xl border-b-8 border-[#DDCF95] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
+          className="bg-[#F4E7B2] p-6 sm:p-8 rounded-3xl border-b-[12px] border-[#DDCF95] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
         >
           <div className="flex justify-between items-start">
             <img src="/leon-matematicas.png" alt="Matemáticas" className="w-16 h-16 sm:w-[93px] sm:h-[93px] object-contain filter drop-shadow-md" />
@@ -444,7 +657,7 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
 
         <button 
           onClick={() => { soundService.playSFX('click'); onSelectLesson('historia'); }}
-          className="bg-[#BFD8C1] p-6 sm:p-8 rounded-xl border-b-8 border-[#A6C0A8] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
+          className="bg-[#BFD8C1] p-6 sm:p-8 rounded-3xl border-b-[12px] border-[#A6C0A8] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
         >
           <div className="flex justify-between items-start">
             <img src="/leon-historia.png" alt="Historia" className="w-16 h-16 sm:w-[93px] sm:h-[93px] object-contain filter drop-shadow-md" />
@@ -460,7 +673,7 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
 
         <button 
           onClick={() => { soundService.playSFX('click'); onSelectLesson('ciencias'); }}
-          className="bg-[#D8B4E2] p-6 sm:p-8 rounded-xl border-b-8 border-[#BD9AC7] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
+          className="bg-[#D8B4E2] p-6 sm:p-8 rounded-3xl border-b-[12px] border-[#BD9AC7] text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
         >
           <div className="flex justify-between items-start">
             <img src="/leon-ciencias.png" alt="Ciencias" className="w-16 h-16 sm:w-[93px] sm:h-[93px] object-contain filter drop-shadow-md" />
@@ -473,22 +686,104 @@ const AdventureMapView = ({ progress, onSelectLesson, onViewShop }: { progress: 
             </div>
           </div>
         </button>
+
+        {unlockedCategories.includes('musica') && (
+          <button 
+            onClick={() => { soundService.playSFX('click'); onSelectLesson('musica'); }}
+            className="bg-pink-300 p-6 sm:p-8 rounded-3xl border-b-[12px] border-pink-400 text-left chunky-button flex flex-col justify-between h-48 sm:h-64 group"
+          >
+            <div className="flex justify-between items-start">
+              <img 
+                src="/Dj leo.png" 
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (!target.src.includes('logo.png')) {
+                    target.src = '/logo.png';
+                  }
+                }}
+                alt="Música" 
+                className="w-16 h-16 sm:w-[93px] sm:h-[93px] object-contain filter drop-shadow-md" 
+                referrerPolicy="no-referrer" 
+              />
+              <span className="bg-pink-800/10 px-3 py-1 rounded-full text-pink-900 font-bold text-xs sm:text-sm">Nivel {getLevel(progress.musica || 0)}/5</span>
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-pink-900 mb-2">Música</h2>
+              <div className="w-full bg-pink-800/10 h-3 sm:h-4 rounded-full overflow-hidden">
+                <div className="bg-pink-600 h-full transition-all duration-500" style={{ width: `${progress.musica || 0}%` }} />
+              </div>
+            </div>
+          </button>
+        )}
       </div>
 
-      {/* Hero Banner */}
-      <section className="relative rounded-xl overflow-hidden mb-12 border-4 border-white shadow-xl bg-primary-container/20 p-8 min-h-[200px]">
-        <div className="relative z-10 flex flex-col items-start max-w-lg">
-          <span className="bg-tertiary text-white px-4 py-1 rounded-full font-bold text-xs mb-4">¡NUEVO!</span>
-          <h2 className="text-3xl font-extrabold text-primary mb-2">Categorías Premium</h2>
-          <p className="text-on-surface-variant mb-6">Explora el mundo de los Dinosaurios y los misterios del Espacio Exterior.</p>
-          <button 
-            onClick={onViewShop}
-            className="bg-secondary text-white px-8 py-3 rounded-full font-bold chunky-button chunky-shadow-secondary"
-          >
-            Ver más
-          </button>
+      {unlockedCategories.includes('musica') ? (
+        <section className="relative rounded-3xl overflow-hidden mb-12 border-4 border-white shadow-xl bg-purple-50 p-8 min-h-[200px]">
+          <div className="relative z-10 flex flex-col items-start max-w-lg">
+            <span className="bg-purple-500 text-white px-4 py-1 rounded-full font-bold text-xs mb-4">¡PRÓXIMAMENTE!</span>
+            <h2 className="text-3xl font-extrabold text-purple-700 mb-2">Más Categorías muy Pronto</h2>
+            <p className="text-purple-900/80 mb-6 font-medium">Estamos preparando nuevas y emocionantes categorías para que sigas aprendiendo con Leo. ¡Mantente atento!</p>
+          </div>
+        </section>
+      ) : (
+        <section className="relative rounded-3xl overflow-hidden mb-12 border-4 border-white shadow-xl bg-pink-50 p-8 min-h-[200px]">
+          <div className="relative z-10 flex flex-col items-start max-w-lg">
+            <span className="bg-pink-500 text-white px-4 py-1 rounded-full font-bold text-xs mb-4">¡NUEVO!</span>
+            <h2 className="text-3xl font-extrabold text-pink-700 mb-2">Categorías Premium</h2>
+            <p className="text-pink-900/80 mb-6 font-medium">Desbloquea contenido exclusivo de Música en tu Mapa de Progreso. ¡Conviértete en un artista!</p>
+            <button 
+              onClick={() => setShowUnlockModal(true)}
+              className="bg-pink-500 text-white px-8 py-3 rounded-full font-bold chunky-button chunky-shadow-secondary"
+            >
+              Ver más
+            </button>
+          </div>
+        </section>
+      )}
+
+      {showUnlockModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-[36px] max-w-sm w-full p-8 border-8 border-surface-dim shadow-2xl relative">
+            <button 
+              onClick={() => setShowUnlockModal(false)}
+              className="absolute -top-4 -right-4 w-12 h-12 bg-surface-dim hover:bg-surface-container rounded-full text-on-surface-variant flex items-center justify-center chunky-button chunky-shadow-secondary border-4 border-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div className="text-center">
+              <div className="bg-pink-100 text-pink-500 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6 transform -rotate-6 shadow-md border-4 border-pink-200">
+                <Lock className="w-12 h-12" />
+              </div>
+              
+              <h3 className="text-3xl font-extrabold text-on-surface mb-2 tracking-tight">Desbloquear Música</h3>
+              <p className="text-lg text-on-surface-variant font-medium mb-8">
+                ¡Aprende sobre música y diviértete componiendo canciones!
+              </p>
+              
+              <div className="flex justify-center items-center gap-3 bg-surface-container rounded-2xl p-4 mb-8">
+                <img src="/leo-coin.png" alt="Coin" className="w-8 h-8 object-contain" />
+                <span className="text-2xl font-black text-[#D4AF37]">2000 Leocoins</span>
+              </div>
+              
+              <button
+                onClick={() => {
+                  soundService.playSFX('click');
+                  if (coins >= 2000) {
+                    onUnlockCategory('musica');
+                    setShowUnlockModal(false);
+                  } else {
+                    alert("No tienes suficientes Leo Coins para desbloquear esta categoría.");
+                  }
+                }}
+                className={`w-full py-4 px-6 rounded-2xl font-black text-xl transition-all chunky-button ${coins >= 2000 ? 'bg-primary text-white chunky-shadow-primary' : 'bg-surface-dim text-on-surface-variant/50 cursor-not-allowed border-4 border-surface-container'}`}
+              >
+                {coins >= 2000 ? '¡Desbloquear ahora!' : 'No tienes suficientes'}
+              </button>
+            </div>
+          </div>
         </div>
-      </section>
+      )}
     </main>
   );
 };
@@ -553,9 +848,10 @@ const LessonView = ({
   onGoToShop,
   onShopBack,
   onBuyCoins,
+  onExchangeCoins,
   onAnswerResult
 }: { 
-  category: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias'; 
+  category: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias' | 'musica' | null; 
   user: UserProfile; 
   coins: number;
   showShopOverlay?: boolean;
@@ -565,7 +861,8 @@ const LessonView = ({
   onGoToShop: () => void;
   onShopBack: () => void;
   onBuyCoins: (amount: number) => void;
-  onAnswerResult: (category: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias', correct: boolean) => void;
+  onExchangeCoins: (amount: number) => void;
+  onAnswerResult: (category: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias' | 'musica', correct: boolean) => void;
 }) => {
   const [tasks, setTasks] = useState<LessonTask[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -667,7 +964,7 @@ const LessonView = ({
   }, []);
 
   if (showShopOverlay) {
-    return <ShopView onBuyCoins={onBuyCoins} onBack={onShopBack} />;
+    return <ShopView coins={coins} onBuyCoins={onBuyCoins} onExchangeCoins={onExchangeCoins} onBack={onShopBack} />;
   }
 
   if (loading) {
@@ -831,7 +1128,7 @@ const LessonView = ({
         <div className="font-bold text-on-surface-variant text-sm sm:text-base shrink-0">{currentTaskIndex + 1} de {tasks.length}</div>
       </div>
 
-      <div className="w-full bg-white rounded-2xl border-4 border-surface-container p-4 sm:p-8 shadow-sm">
+      <div className="w-full bg-white rounded-3xl border-4 border-surface-container p-4 sm:p-8 shadow-md">
         <p className="text-2xl font-medium text-on-surface leading-normal">
           {currentQuestion.text}
         </p>
@@ -866,7 +1163,7 @@ const LessonView = ({
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="bg-tertiary-fixed text-on-tertiary-container p-4 rounded-xl rounded-bl-none font-bold shadow-sm">
+              <div className="bg-tertiary-fixed text-on-tertiary-container p-4 rounded-2xl rounded-bl-none font-bold shadow-sm">
                 ¡Lee bien, después te pregunto!
               </div>
             </div>
@@ -930,7 +1227,7 @@ const LessonView = ({
                             : { scale: 1 }
                     }
                     transition={{ duration: 0.4 }}
-                    className={`p-6 rounded-xl border-4 text-xl font-bold transition-colors relative overflow-hidden flex items-center justify-center ${
+                    className={`p-6 rounded-2xl border-4 text-xl font-bold transition-colors relative overflow-hidden flex items-center justify-center ${
                       feedback 
                         ? isCorrectOption
                           ? 'border-green-500 bg-green-100 text-green-800 ring-4 ring-green-500/20 z-10'
@@ -978,7 +1275,7 @@ const LessonView = ({
               </button>
             ) : (
               <div className="flex flex-col gap-4">
-                <div className={`p-4 rounded-xl border-4 font-bold text-lg text-center ${feedback === 'correct' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700'}`}>
+                <div className={`p-4 rounded-2xl border-4 font-bold text-lg text-center ${feedback === 'correct' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700'}`}>
                   {feedback === 'correct' ? '¡Correcto! ¡Muy bien!' : '¡Oh no! Esa no era la respuesta correcta.'}
                 </div>
                 <button 
@@ -997,8 +1294,8 @@ const LessonView = ({
   );
 };
 
-const ShopView = ({ onBuyCoins, onBack }: { onBuyCoins: (amount: number) => void; onBack?: () => void }) => {
-  const [activeTab, setActiveTab] = useState<'suscripcion' | 'monedas'>('suscripcion');
+const ShopView = ({ coins, onBuyCoins, onExchangeCoins, onBack }: { coins: number; onBuyCoins: (amount: number) => void; onExchangeCoins: (amount: number) => void; onBack?: () => void }) => {
+  const [activeTab, setActiveTab] = useState<'suscripcion' | 'monedas' | 'colaboradores'>('suscripcion');
 
   const subs = [
     { title: 'Mensual', price: '$5,990', icon: Star, color: 'bg-primary-fixed', shadow: 'chunky-shadow-primary', bgButton: 'bg-primary' },
@@ -1011,6 +1308,12 @@ const ShopView = ({ onBuyCoins, onBack }: { onBuyCoins: (amount: number) => void
     { title: 'Pack mediano', amount: 350, price: '$2,990', color: 'bg-secondary-container', shadow: 'chunky-shadow-secondary', popular: true, bgButton: 'bg-secondary' },
     { title: 'Pack grande', amount: 800, price: '$5,990', color: 'bg-tertiary-fixed', shadow: 'chunky-shadow-tertiary', bgButton: 'bg-tertiary' },
     { title: 'Pack premium', amount: 2000, price: '$12,990', color: 'bg-primary-container', shadow: 'chunky-shadow-primary', bgButton: 'bg-primary' },
+  ];
+
+  const collaborators = [
+    { title: 'Entrada Buin Zoo', amount: 2500, color: 'bg-[#E5F5E0]', shadow: 'chunky-shadow-secondary', bgButton: 'bg-[#41AB5D]', logo: '/logo buinzoo.jpg', icon: Award, label: 'Aventura Animal' },
+    { title: 'Entrada Kidzania', amount: 1900, color: 'bg-[#FEE6CE]', shadow: 'chunky-shadow-primary', bgButton: 'bg-[#FD8D3C]', logo: '/logo kid.png', icon: Star, label: 'Ciudad Infantil' },
+    { title: 'Entrada MIM', amount: 1150, color: 'bg-[#DEEBF7]', shadow: 'chunky-shadow-tertiary', bgButton: 'bg-[#9ECAE1]', logo: '/logo mim.png', icon: Check, label: 'Museo Interactivo' },
   ];
 
   return (
@@ -1040,6 +1343,12 @@ const ShopView = ({ onBuyCoins, onBack }: { onBuyCoins: (amount: number) => void
           className={`flex-1 py-3 px-6 rounded-full font-bold whitespace-nowrap transition-all ${activeTab === 'monedas' ? 'bg-white shadow text-primary' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
         >
           Leo Coins
+        </button>
+        <button 
+          onClick={() => { soundService.playSFX('click'); setActiveTab('colaboradores'); }}
+          className={`flex-1 py-3 px-6 rounded-full font-bold whitespace-nowrap transition-all ${activeTab === 'colaboradores' ? 'bg-white shadow text-primary' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+        >
+          Colaboradores
         </button>
       </div>
 
@@ -1104,6 +1413,50 @@ const ShopView = ({ onBuyCoins, onBack }: { onBuyCoins: (amount: number) => void
                     >
                       {pack.price}
                     </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Colaboradores */}
+          {activeTab === 'colaboradores' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {collaborators.map((collab) => (
+                <div 
+                  key={collab.title}
+                  className={`relative p-8 rounded-3xl border-4 border-surface-container bg-white flex flex-col items-center text-center transition-transform hover:scale-[1.02]`}
+                >
+                  <div className={`w-24 h-24 bg-white rounded-3xl border-4 border-surface-container flex items-center justify-center mb-6 shadow-md overflow-hidden p-2 group-hover:scale-110 transition-transform duration-300`}>
+                    {collab.logo ? (
+                      <img src={collab.logo} alt={collab.title} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                    ) : (
+                      <div className={`w-full h-full ${collab.color} rounded-2xl flex items-center justify-center`}>
+                        <collab.icon className="w-10 h-10 text-on-surface" />
+                      </div>
+                    )}
+                  </div>
+                  <h2 className="text-2xl font-bold text-on-surface mb-1">{collab.title}</h2>
+                  <p className="text-on-surface-variant font-medium mb-6">{collab.label}</p>
+                  <div className="mt-auto w-full flex flex-col gap-2">
+                    <button 
+                      onClick={() => {
+                        soundService.playSFX('click');
+                        if (coins >= collab.amount) {
+                          onExchangeCoins(collab.amount);
+                          alert(`¡Canjeaste exitosamente: ${collab.title}! Revisa tu correo electrónico para más detalles.`);
+                        } else {
+                          // Not enough coins
+                        }
+                      }}
+                      className={`w-full py-4 px-6 rounded-2xl font-black text-xl transition-all chunky-button ${coins >= collab.amount ? `${collab.bgButton} text-white ${collab.shadow}` : 'bg-surface-dim text-on-surface-variant/50 cursor-not-allowed border-4 border-surface-container'}`}
+                    >
+                      {coins >= collab.amount ? 'Canjear' : 'No tienes'}
+                    </button>
+                    <span className="flex items-center justify-center gap-1 font-bold text-[#D4AF37]">
+                      <img src="/leo-coin.png" className="w-5 h-5 object-contain" alt="co" />
+                      {collab.amount} LC
+                    </span>
                   </div>
                 </div>
               ))}
@@ -1187,9 +1540,11 @@ export default function App() {
       lenguaje: 0,
       matematicas: 0,
       historia: 0,
-      ciencias: 0
+      ciencias: 0,
+      musica: 0
     },
     activeCategory: null,
+    unlockedCategories: [],
     stats: {
       screenTime: 0,
       readingTime: 0,
@@ -1197,7 +1552,8 @@ export default function App() {
         lenguaje: { correct: 0, total: 0 },
         matematicas: { correct: 0, total: 0 },
         historia: { correct: 0, total: 0 },
-        ciencias: { correct: 0, total: 0 }
+        ciencias: { correct: 0, total: 0 },
+        musica: { correct: 0, total: 0 }
       }
     }
   });
@@ -1232,12 +1588,12 @@ export default function App() {
         newProgress[prev.activeCategory!] = Math.min(100, newProgress[prev.activeCategory!] + 20);
         
         const vals = Object.values(newProgress) as number[];
-        const overall = vals.reduce((a, b) => a + b, 0) / 4;
+        const overall = vals.reduce((a, b) => a + b, 0) / vals.length;
 
         return {
           ...prev,
           coins: prev.coins + 50,
-          view: 'map',
+          view: 'dance_break',
           categoryProgress: newProgress,
           progress: overall,
           activeCategory: null
@@ -1252,7 +1608,7 @@ export default function App() {
     setState(prev => ({ ...prev, coins: prev.coins + amount }));
   };
 
-  const handleSelectCategory = (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias') => {
+  const handleSelectCategory = (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias' | 'musica') => {
     setState({ ...state, view: 'progress', activeCategory: cat });
   };
 
@@ -1262,7 +1618,7 @@ export default function App() {
     alert(`¡Felicidades! Has conseguido ${amount} Leo Coins.`);
   };
 
-  const handleAnswerResult = (category: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias', correct: boolean) => {
+  const handleAnswerResult = (category: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias' | 'musica', correct: boolean) => {
     setState(prev => {
       const currentStats = prev.stats.answers[category];
       return {
@@ -1284,6 +1640,14 @@ export default function App() {
   const isMainView = ['map', 'shop', 'progress', 'parents'].includes(state.view);
 
   // When changing view manually from BottomNav, clear returnToView
+  const handleUnlockCategory = (cat: string) => {
+    setState(prev => ({
+      ...prev,
+      coins: prev.coins - 2000,
+      unlockedCategories: [...prev.unlockedCategories, cat]
+    }));
+  };
+
   const handleNavChange = (view: AppView) => {
     setState({ ...state, view, returnToView: null });
   };
@@ -1314,8 +1678,11 @@ export default function App() {
           {state.view === 'map' && (
             <AdventureMapView 
               progress={state.categoryProgress} 
+              unlockedCategories={state.unlockedCategories}
               onSelectLesson={handleSelectCategory} 
               onViewShop={() => setState({ ...state, view: 'shop' })}
+              onUnlockCategory={handleUnlockCategory}
+              coins={state.coins}
             />
           )}
           {state.view === 'lesson' && state.activeCategory && state.user && (
@@ -1330,6 +1697,7 @@ export default function App() {
               onGoToShop={() => setState({ ...state, returnToView: 'lesson' })}
               onShopBack={() => setState({ ...state, returnToView: null })}
               onBuyCoins={handleBuyCoins}
+              onExchangeCoins={(amount) => setState({ ...state, coins: state.coins - amount })}
               onAnswerResult={handleAnswerResult}
             />
           )}
@@ -1339,9 +1707,14 @@ export default function App() {
               onFinish={handleFinishLesson}
             />
           )}
+          {state.view === 'dance_break' && (
+            <DanceBreakView onFinish={() => setState({ ...state, view: 'progress' })} />
+          )}
           {state.view === 'shop' && state.returnToView !== 'lesson' && (
             <ShopView 
+              coins={state.coins}
               onBuyCoins={handleBuyCoins} 
+              onExchangeCoins={(amount) => setState({ ...state, coins: state.coins - amount })}
               onBack={state.returnToView ? () => {
                 setState({ ...state, view: state.returnToView!, returnToView: null });
               } : undefined}
@@ -1354,6 +1727,8 @@ export default function App() {
               progress={state.categoryProgress} 
               overall={state.progress} 
               initialCategory={state.activeCategory || 'lenguaje'}
+              unlockedCategories={state.unlockedCategories}
+              onUnlockCategory={handleUnlockCategory}
               onStartLesson={(cat, levelIndex) => {
                 if (state.user?.grade === '1ro básico' && cat === 'lenguaje' && (levelIndex % 2 === 0)) {
                   setState({...state, view: 'calligraphy', activeCategory: cat});
@@ -1380,15 +1755,17 @@ export default function App() {
   );
 }
 
-const ProgressView = ({ user, coins, progress, overall, initialCategory, onStartLesson }: { user: UserProfile; coins: number; progress: CategoryProgress; overall: number; initialCategory: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias'; onStartLesson: (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias', levelIndex: number) => void; }) => {
+const ProgressView = ({ user, coins, progress, overall, initialCategory, onStartLesson, unlockedCategories, onUnlockCategory }: { user: UserProfile; coins: number; progress: CategoryProgress; overall: number; initialCategory: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias' | 'musica'; onStartLesson: (cat: 'lenguaje' | 'matematicas' | 'historia' | 'ciencias' | 'musica', levelIndex: number) => void; unlockedCategories: string[]; onUnlockCategory: (cat: string) => void; }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<'lenguaje' | 'matematicas' | 'historia' | 'ciencias'>(initialCategory || 'lenguaje');
+  const [activeCategory, setActiveCategory] = useState<'lenguaje' | 'matematicas' | 'historia' | 'ciencias' | 'musica'>(initialCategory || 'lenguaje');
+  const [categoryToUnlock, setCategoryToUnlock] = useState<string | null>(null);
 
   const categories = [
-    { id: 'lenguaje', label: 'Lenguaje', color: 'bg-primary-container', activeColor: 'bg-primary', text: 'text-on-primary-container', onActiveText: 'text-on-primary', border: 'border-primary', value: progress.lenguaje || 0, iconSrc: '/leon-lenguaje.png' },
-    { id: 'matematicas', label: 'Matemáticas', color: 'bg-tertiary-container', activeColor: 'bg-tertiary', text: 'text-on-tertiary-container', onActiveText: 'text-on-tertiary', border: 'border-tertiary', value: progress.matematicas || 0, iconSrc: '/leon-matematicas.png' },
-    { id: 'historia', label: 'Historia', color: 'bg-secondary-container', activeColor: 'bg-secondary', text: 'text-on-secondary-container', onActiveText: 'text-on-secondary', border: 'border-secondary', value: progress.historia || 0, iconSrc: '/leon-historia.png' },
-    { id: 'ciencias', label: 'Ciencias', color: 'bg-purple-200', activeColor: 'bg-purple-500', text: 'text-purple-900', onActiveText: 'text-white', border: 'border-purple-500', value: progress.ciencias || 0, iconSrc: '/leon-ciencias.png' },
+    { id: 'lenguaje', label: 'Lenguaje', color: 'bg-primary-container', activeColor: 'bg-primary', text: 'text-on-primary-container', onActiveText: 'text-on-primary', border: 'border-primary', value: progress.lenguaje || 0, iconSrc: '/leon-lenguaje.png', isPremium: false },
+    { id: 'matematicas', label: 'Matemáticas', color: 'bg-tertiary-container', activeColor: 'bg-tertiary', text: 'text-on-tertiary-container', onActiveText: 'text-on-tertiary', border: 'border-tertiary', value: progress.matematicas || 0, iconSrc: '/leon-matematicas.png', isPremium: false },
+    { id: 'historia', label: 'Historia', color: 'bg-secondary-container', activeColor: 'bg-secondary', text: 'text-on-secondary-container', onActiveText: 'text-on-secondary', border: 'border-secondary', value: progress.historia || 0, iconSrc: '/leon-historia.png', isPremium: false },
+    { id: 'ciencias', label: 'Ciencias', color: 'bg-purple-200', activeColor: 'bg-purple-500', text: 'text-purple-900', onActiveText: 'text-white', border: 'border-purple-500', value: progress.ciencias || 0, iconSrc: '/leon-ciencias.png', isPremium: false },
+    { id: 'musica', label: 'Música (Premium)', color: 'bg-pink-100', activeColor: 'bg-pink-400', text: 'text-pink-800', onActiveText: 'text-white', border: 'border-pink-400', value: progress.musica || 0, iconSrc: '/Dj leo.png', isPremium: true, price: 2000 },
   ] as const;
 
   const currentCategory = categories.find(c => c.id === activeCategory)!;
@@ -1468,20 +1845,87 @@ const ProgressView = ({ user, coins, progress, overall, initialCategory, onStart
       <div className="flex overflow-x-auto hide-scrollbar gap-3 sm:gap-4 pb-6 mb-4 px-2 snap-x">
         {categories.map((cat) => {
           const isActive = activeCategory === cat.id;
+          const isLocked = cat.isPremium && !unlockedCategories.includes(cat.id);
+          
           return (
             <button
               key={cat.id}
-              onClick={() => { soundService.playSFX('click'); setActiveCategory(cat.id as any); }}
-              className={`snap-center shrink-0 w-auto flex-1 flex flex-row items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 rounded-3xl transition-all chunky-button ${isActive ? `${cat.activeColor} ${cat.onActiveText} shadow-[0_6px_0_0_rgba(0,0,0,0.2)] -translate-y-1 font-black ring-4 ring-offset-2 ring-transparent ring-offset-surface-dim` : `bg-white ${cat.text} border-2 border-surface-dim shadow-[0_6px_0_0_#eae8e3] font-bold hover:-translate-y-1 hover:shadow-[0_8px_0_0_#eae8e3]`}`}
+              onClick={() => { 
+                soundService.playSFX('click'); 
+                if (isLocked) {
+                  setCategoryToUnlock(cat.id);
+                } else {
+                  setActiveCategory(cat.id as any);
+                }
+              }}
+              className={`relative snap-center shrink-0 w-auto flex-1 flex flex-row items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 rounded-3xl transition-all chunky-button ${isLocked ? 'bg-surface-container opacity-80 border-2 border-outline/30 grayscale' : isActive ? `${cat.activeColor} ${cat.onActiveText} shadow-[0_6px_0_0_rgba(0,0,0,0.2)] -translate-y-1 font-black ring-4 ring-offset-2 ring-transparent ring-offset-surface-dim` : `bg-white ${cat.text} border-2 border-surface-dim shadow-[0_6px_0_0_#eae8e3] font-bold hover:-translate-y-1 hover:shadow-[0_8px_0_0_#eae8e3]`}`}
             >
-              <div className={`${isActive ? 'bg-white/20' : 'bg-surface-container'} p-2 rounded-2xl shrink-0`}>
-                <img src={cat.iconSrc} alt={cat.label} className="w-8 h-8 object-contain filter drop-shadow-md" />
+              <div className={`${isLocked ? 'bg-outline/10 text-on-surface-variant' : isActive ? 'bg-white/20' : 'bg-surface-container'} p-2 rounded-2xl shrink-0 flex items-center justify-center`}>
+                {isLocked ? <Lock className="w-8 h-8" /> : (
+                  <img 
+                    src={cat.iconSrc} 
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (!target.src.includes('logo.png')) {
+                        target.src = '/logo.png';
+                      }
+                    }}
+                    alt={cat.label} 
+                    className="w-8 h-8 object-contain filter drop-shadow-md" 
+                    referrerPolicy="no-referrer"
+                  />
+                )}
               </div>
               <span className="text-sm sm:text-lg tracking-wide whitespace-nowrap">{cat.label}</span>
             </button>
           );
         })}
       </div>
+
+        {categoryToUnlock && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div className="bg-white rounded-[36px] max-w-sm w-full p-8 border-8 border-surface-dim shadow-2xl relative">
+              <button 
+                onClick={() => setCategoryToUnlock(null)}
+                className="absolute -top-4 -right-4 w-12 h-12 bg-surface-dim hover:bg-surface-container rounded-full text-on-surface-variant flex items-center justify-center chunky-button chunky-shadow-secondary border-4 border-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              
+              <div className="text-center">
+                <div className="bg-pink-100 text-pink-500 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6 transform -rotate-6 shadow-md border-4 border-pink-200">
+                  <Lock className="w-12 h-12" />
+                </div>
+                
+                <h3 className="text-3xl font-extrabold text-on-surface mb-2 tracking-tight">Desbloquear Música</h3>
+                <p className="text-lg text-on-surface-variant font-medium mb-8">
+                  ¡Aprende sobre música y diviértete componiendo canciones!
+                </p>
+                
+                <div className="flex justify-center items-center gap-3 bg-surface-container rounded-2xl p-4 mb-8">
+                  <img src="/leo-coin.png" alt="Coin" className="w-8 h-8 object-contain" />
+                  <span className="text-2xl font-black text-[#D4AF37]">2000 Leocoins</span>
+                </div>
+                
+                <button
+                  onClick={() => {
+                    soundService.playSFX('click');
+                    if (coins >= 2000) {
+                      onUnlockCategory(categoryToUnlock);
+                      setCategoryToUnlock(null);
+                      setActiveCategory(categoryToUnlock as any);
+                    } else {
+                      // Not enough coins
+                    }
+                  }}
+                  className={`w-full py-4 px-6 rounded-2xl font-black text-xl transition-all chunky-button ${coins >= 2000 ? 'bg-primary text-white chunky-shadow-primary' : 'bg-surface-dim text-on-surface-variant/50 cursor-not-allowed border-4 border-surface-container'}`}
+                >
+                  {coins >= 2000 ? '¡Desbloquear ahora!' : 'No tienes suficientes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       {/* Map Visualization */}
       <div className={`rounded-[40px] border-8 border-surface-container ${currentCategory.color}/30 p-8 mb-12 shadow-[0_8px_0_0_#eae8e3] relative overflow-hidden transition-colors duration-500`}>
@@ -1493,6 +1937,8 @@ const ProgressView = ({ user, coins, progress, overall, initialCategory, onStart
           <div className="absolute inset-0 w-full h-full pointer-events-none rounded-[32px] overflow-hidden opacity-90" style={{ backgroundColor: '#ebd5b3', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cg stroke='%238c694a' stroke-width='1' opacity='0.2'%3E%3Cpath d='M0 100 L400 100 M0 200 L400 200 M0 300 L400 300' /%3E%3Cpath d='M100 0 L100 400 M200 0 L200 400 M300 0 L300 400' /%3E%3C/g%3E%3Cpath d='M0 50 Q50 60 80 30 T150 20 T200 80 T250 50 T300 100 T350 40 L400 50 L400 0 L0 0 Z' fill='%23d4af7a' opacity='0.3' stroke='%238c694a' stroke-width='2' /%3E%3Cpath d='M0 350 Q40 320 100 350 T180 300 T250 360 T320 310 T400 380 L400 400 L0 400 Z' fill='%23d4af7a' opacity='0.3' stroke='%238c694a' stroke-width='2' /%3E%3Cg transform='translate(330, 80) scale(0.6)' opacity='0.4'%3E%3Ccircle cx='0' cy='0' r='40' fill='none' stroke='%238c694a' stroke-width='2' /%3E%3Ccircle cx='0' cy='0' r='30' fill='none' stroke='%238c694a' stroke-width='1' /%3E%3Cpath d='M0 -50 L10 0 L0 50 L-10 0 Z' fill='%238c694a' /%3E%3Cpath d='M-50 0 L0 10 L50 0 L0 -10 Z' fill='%238c694a' /%3E%3Cpath d='M0 -50 L0 50' stroke='%23ebd5b3' stroke-width='1' /%3E%3Cpath d='M-50 0 L50 0' stroke='%23ebd5b3' stroke-width='1' /%3E%3C/g%3E%3Cg transform='translate(80, 250)' stroke='%238c694a' stroke-width='3' stroke-linecap='round'%3E%3Cline x1='-10' y1='-10' x2='10' y2='10' /%3E%3Cline x1='10' y1='-10' x2='-10' y2='10' /%3E%3C/g%3E%3Cg transform='translate(280, 280)' stroke='%238c694a' stroke-width='3' stroke-linecap='round'%3E%3Cline x1='-10' y1='-10' x2='10' y2='10' /%3E%3Cline x1='10' y1='-10' x2='-10' y2='10' /%3E%3C/g%3E%3C/svg%3E")`, backgroundSize: '400px 400px', border: '12px solid #c39c6b' }} />
         ) : currentCategory.id === 'ciencias' ? (
           <div className="absolute inset-0 w-full h-full pointer-events-none rounded-[32px] overflow-hidden opacity-100" style={{ backgroundColor: '#faf5ff', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cg stroke='%23c4b5fd' stroke-width='2' opacity='0.4' fill='none'%3E%3Cpath d='M30,0 L60,15 L60,45 L30,60 L0,45 L0,15 Z' /%3E%3Cpath d='M105,45 L135,60 L135,90 L105,105 L75,90 L75,60 Z' /%3E%3Cpath d='M30,90 L60,105 L60,135 L30,150 L0,135 L0,105 Z' /%3E%3C/g%3E%3Ccircle cx='15' cy='75' r='5' fill='%23a78bfa' opacity='0.5' /%3E%3Ccircle cx='25' cy='85' r='3' fill='%238b5cf6' opacity='0.6' /%3E%3Ccircle cx='45' cy='25' r='4' fill='%23a78bfa' opacity='0.5' /%3E%3Ccircle cx='115' cy='15' r='6' fill='%23c4b5fd' opacity='0.4' /%3E%3Cg transform='translate(80, 110)' opacity='0.8'%3E%3Cpath d='M -10,15 L 10,15 L 15,25 L -15,25 Z' fill='%2334d399' /%3E%3Cpath d='M -5,-5 L 5,-5 L 5,5 L 15,25 L 15,30 L -15,30 L -15,25 L -5,5 Z' fill='none' stroke='%23a855f7' stroke-width='2' stroke-linejoin='round' /%3E%3Ccircle cx='0' cy='20' r='2' fill='%23fff' opacity='0.9' /%3E%3Ccircle cx='-5' cy='25' r='1.5' fill='%23fff' opacity='0.7' /%3E%3Ccircle cx='5' cy='22' r='1' fill='%23fff' opacity='0.8' /%3E%3C/g%3E%3Cg transform='translate(130, 20) rotate(15)' opacity='0.9'%3E%3Cpath d='M -4,10 L 4,10 L 4,25 A 4,4 0 0,1 -4,25 Z' fill='%232dd4bf' /%3E%3Cpath d='M -4,0 L 4,0 M -4,0 L -4,25 A 4,4 0 0,0 4,25 L 4,0' fill='none' stroke='%237c3aed' stroke-width='2' stroke-linecap='round' /%3E%3Ccircle cx='0' cy='15' r='1.5' fill='%23fff' opacity='0.9' /%3E%3C/g%3E%3C/svg%3E")`, backgroundSize: '150px 150px', border: '12px solid #c084fc' }} />
+        ) : currentCategory.id === 'musica' ? (
+          <div className="absolute inset-0 w-full h-full pointer-events-none rounded-[32px] overflow-hidden opacity-100" style={{ backgroundColor: '#fce7f3', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg stroke='%23f9a8d4' stroke-width='2' fill='none' opacity='0.6'%3E%3Cpath d='M 10 90 Q 30 10 50 50 T 90 10' /%3E%3Cpath d='M 10 50 Q 30 90 50 10 T 90 50' /%3E%3Ccircle cx='20' cy='20' r='4' fill='%23ec4899' opacity='0.5' /%3E%3Ccircle cx='80' cy='80' r='6' fill='%23ec4899' opacity='0.3' /%3E%3Ctext x='40' y='80' font-size='20' fill='%23f472b6' font-weight='bold' opacity='0.4'%3E♫%3C/text%3E%3Ctext x='70' y='30' font-size='16' fill='%23db2777' font-weight='bold' opacity='0.5'%3E♪%3C/text%3E%3C/g%3E%3C/svg%3E")`, backgroundSize: '100px 100px', border: '12px solid #f472b6' }} />
         ) : (
           <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 10px 10px, currentColor 3px, transparent 0)', backgroundSize: '40px 40px', color: 'var(--color-primary)' }} />
         )}
@@ -1534,7 +1980,7 @@ const ProgressView = ({ user, coins, progress, overall, initialCategory, onStart
              <path 
                d="M 50 320 C 120 320, 150 250, 250 250 C 350 250, 300 180, 200 180 C 100 180, 100 100, 200 100 C 300 100, 320 40, 250 40" 
                fill="none" 
-               stroke={currentCategory.id === 'matematicas' ? 'rgba(255,255,255,0.3)' : currentCategory.id === 'historia' ? 'rgba(140,105,74,0.4)' : currentCategory.id === 'ciencias' ? 'rgba(113,128,150,0.5)' : 'rgba(0,0,0,0.35)'} 
+               stroke={currentCategory.id === 'matematicas' ? 'rgba(255,255,255,0.3)' : currentCategory.id === 'historia' ? 'rgba(140,105,74,0.4)' : currentCategory.id === 'ciencias' ? 'rgba(113,128,150,0.5)' : currentCategory.id === 'musica' ? 'rgba(219,39,119,0.3)' : 'rgba(0,0,0,0.35)'} 
                strokeWidth="20" 
                strokeLinecap="round" 
                strokeLinejoin="round"
@@ -1549,7 +1995,7 @@ const ProgressView = ({ user, coins, progress, overall, initialCategory, onStart
                strokeWidth="20" 
                strokeLinecap="round" 
                strokeLinejoin="round" 
-               className={`transition-all duration-1000 ease-out animate-pulse-path ${currentCategory.id === 'matematicas' ? 'text-white' : currentCategory.id === 'historia' ? 'text-amber-900' : currentCategory.id === 'ciencias' ? 'text-blue-300' : currentCategory.text}`}
+               className={`transition-all duration-1000 ease-out animate-pulse-path ${currentCategory.id === 'matematicas' ? 'text-white' : currentCategory.id === 'historia' ? 'text-amber-900' : currentCategory.id === 'ciencias' ? 'text-blue-300' : currentCategory.id === 'musica' ? 'text-pink-500' : currentCategory.text}`}
                strokeDasharray="1000"
                strokeDashoffset={1000 - (1000 * ((Number(currentCategory.value) || 0) / 100))}
              />
@@ -1592,7 +2038,18 @@ const ProgressView = ({ user, coins, progress, overall, initialCategory, onStart
 
                    {isCurrent && (
                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none -rotate-45">
-                       <img src={currentCategory.iconSrc} referrerPolicy="no-referrer" alt={currentCategory.label} className="w-[60px] h-[60px] max-w-none object-contain bounce-animation filter drop-shadow-xl" />
+                       <img 
+                         src={currentCategory.iconSrc} 
+                         onError={(e) => {
+                           const target = e.target as HTMLImageElement;
+                           if (!target.src.includes('logo.png')) {
+                             target.src = '/logo.png';
+                           }
+                         }}
+                         referrerPolicy="no-referrer" 
+                         alt={currentCategory.label} 
+                         className="w-[60px] h-[60px] max-w-none object-contain bounce-animation filter drop-shadow-xl" 
+                       />
                      </div>
                    )}
                    {isCompleted && node.isEnd && (
@@ -1625,6 +2082,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
     { subject: 'Matemáticas', value: progress.matematicas || 0, fullMark: 100 },
     { subject: 'Historia', value: progress.historia || 0, fullMark: 100 },
     { subject: 'Ciencias', value: progress.ciencias || 0, fullMark: 100 },
+    { subject: 'Música', value: progress.musica || 0, fullMark: 100 },
   ];
 
   // Ranking data sorted by value
@@ -1638,6 +2096,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
     { name: 'Matemáticas', respuestas: getAvg(stats.answers.matematicas), fill: '#e6e1ad' },
     { name: 'Historia', respuestas: getAvg(stats.answers.historia), fill: '#c19a6b' },
     { name: 'Ciencias', respuestas: getAvg(stats.answers.ciencias), fill: '#e9d5ff' },
+    { name: 'Música', respuestas: getAvg(stats.answers.musica), fill: '#fbcfe8' },
   ];
 
   const [volume, setVolume] = useState(soundService.volume);
@@ -1661,7 +2120,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-[28px] border-4 border-surface-dim shadow-sm flex items-center gap-6">
+        <div className="bg-white p-6 rounded-3xl border-4 border-surface-dim shadow-md flex items-center gap-6 transition-all hover:shadow-lg hover:-translate-y-1">
           <div className="w-16 h-16 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
             <Clock className="w-8 h-8" />
           </div>
@@ -1671,7 +2130,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
             <p className="text-sm text-green-600 font-bold mt-1">✓ Activo hoy</p>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-[28px] border-4 border-surface-dim shadow-sm flex items-center gap-6">
+        <div className="bg-white p-6 rounded-3xl border-4 border-surface-dim shadow-md flex items-center gap-6 transition-all hover:shadow-lg hover:-translate-y-1">
           <div className="w-16 h-16 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
             <Book className="w-8 h-8" />
           </div>
@@ -1683,7 +2142,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
         </div>
       </div>
 
-      <div className="bg-white p-6 md:p-8 rounded-[32px] border-4 border-surface-dim shadow-sm mb-8">
+        <div className="bg-white p-6 md:p-8 rounded-[36px] border-4 border-surface-dim shadow-md mb-8 transition-all hover:shadow-lg">
         <div className="flex items-center gap-3 mb-6">
           <Settings className="w-6 h-6 text-primary" />
           <h2 className="text-2xl font-bold text-on-surface">Configuración y Sonido</h2>
@@ -1709,7 +2168,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 md:p-8 rounded-[32px] border-4 border-surface-dim shadow-sm">
+        <div className="bg-white p-6 md:p-8 rounded-[36px] border-4 border-surface-dim shadow-md transition-all hover:shadow-lg">
           <div className="flex items-center gap-3 mb-6">
             <Award className="w-6 h-6 text-primary" />
             <h2 className="text-2xl font-bold text-on-surface">Ranking de Materias</h2>
@@ -1717,7 +2176,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
           <div className="space-y-4">
             {rankingData.map((item, index) => (
               <div key={item.subject} className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg ${index === 0 ? 'bg-tertiary-container text-tertiary shadow-[0_4px_0_0_#d3c794] border-2 border-tertiary' : 'bg-surface-container text-on-surface-variant'}`}>
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-lg ${index === 0 ? 'bg-tertiary-container text-tertiary shadow-[0_4px_0_0_#d3c794] border-2 border-tertiary' : 'bg-surface-container text-on-surface-variant'}`}>
                   #{index + 1}
                 </div>
                 <div className="flex-1">
@@ -1727,7 +2186,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
                   </div>
                   <div className="w-full bg-surface-container rounded-full h-3 overflow-hidden">
                     <div 
-                      className="bg-primary h-full rounded-full" 
+                      className="bg-primary h-full rounded-full transition-all duration-1000" 
                       style={{ width: `${item.value}%` }} 
                     />
                   </div>
@@ -1737,7 +2196,7 @@ const ParentsView = ({ user, progress, stats }: { user: UserProfile; progress: C
           </div>
         </div>
 
-        <div className="bg-white p-6 md:p-8 rounded-[32px] border-4 border-surface-dim shadow-sm">
+        <div className="bg-white p-6 md:p-8 rounded-[36px] border-4 border-surface-dim shadow-md transition-all hover:shadow-lg">
           <div className="flex items-center gap-3 mb-6">
             <Target className="w-6 h-6 text-secondary" />
             <h2 className="text-2xl font-bold text-on-surface">Respuestas por Categoría</h2>
