@@ -10,7 +10,7 @@ interface DanceBreakViewProps {
   onFinish: () => void;
 }
 
-const ANIMALS = [
+const PETS = [
   { src: '/leon base.png'},
   { src: '/tigre.png' },
   { src: '/puma.png' },
@@ -46,16 +46,41 @@ export const DanceBreakView = ({ onFinish }: DanceBreakViewProps) => {
       />
  
       {/* Bouncing animals */}
-      {ANIMALS.map((a, i) => {
-        const posStyle: React.CSSProperties = {
-          position: 'absolute',
-          width: a.size,
-          height: a.size,
-          ...(a.top    !== undefined && { top:    a.top    }),
-          ...(a.bottom !== undefined && { bottom: a.bottom }),
-          ...(a.left   !== undefined && { left:   a.left   }),
-          ...(a.right  !== undefined && { right:  a.right  }),
-        };
+      {PETS.map((petSrc, idx) => {
+        const angle = (idx / PETS.length) * Math.PI * 2;
+        const leftOffset = Math.cos(angle) * 38; // 38% from center
+        const topOffset = Math.sin(angle) * 38; // 38% from center
+        
+        return (
+          <div 
+            key={idx}
+            className="absolute z-0 pointer-events-none"
+            style={{
+              left: `calc(50% + ${leftOffset}vw)`,
+              top: `calc(50% + ${topOffset}vh)`,
+              transform: 'translate(-50%, -50%)'
+            }}
+          >
+            <motion.div 
+              animate={{ 
+                y: [0, -30, 0, -30, 0],
+                rotate: [0, 15, -15, 15, 0],
+                scale: [1, 1.1, 1, 1.1, 1] 
+              }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: 1.5, 
+                ease: "easeInOut",
+                delay: idx * 0.15
+              }}
+              className="w-24 h-24 sm:w-32 sm:h-32 drop-shadow-2xl"
+            >
+              <img src={petSrc} alt={`Mascota ${idx}`} className="w-full h-full object-contain pointer-events-none" />
+            </motion.div>
+          </div>
+        );
+      })}
+     
         return (
           <motion.div
             key={i}
