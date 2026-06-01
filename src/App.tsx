@@ -86,7 +86,7 @@ const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, class
         'Lentes claros': { top: '32%', width: '52%', left: '20%', zIndex: 25 },
         'Lentes oscuros': { top: '32%', width: '52%', left: '20%', zIndex: 25 },
         'Bufanda': { bottom: '5%', width: '56%', left: '17%', zIndex: 20 },
-        'Humita': { bottom: '5%', width: '28%', left: '34%', zIndex: 20 }
+        'Humita': { bottom: '50%', width: '28%', left: '34%', zIndex: 20 }
       },
       panda: {
         'Sombrero': { top: '3%', width: '58%', left: '21%', zIndex: 20 },
