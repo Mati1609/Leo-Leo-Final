@@ -81,7 +81,7 @@ const AvatarDisplay = ({ config, className = "" }: { config: AvatarConfig, class
         'Humita': { bottom: '15%', width: '28%', left: '36%', zIndex: 20 }
       },
       puma: {
-        'Sombrero': { top: '3%', width: '58%', left: '21%', zIndex: 20 },
+        'Sombrero': { top: '2%', width: '58%', left: '18%', zIndex: 20 },
         'Corona': { top: '3%', width: '38%', left: '31%', zIndex: 20 },
         'Lentes claros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
         'Lentes oscuros': { top: '34%', width: '52%', left: '24%', zIndex: 25 },
