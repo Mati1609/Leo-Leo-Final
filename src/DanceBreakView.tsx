@@ -167,6 +167,6 @@ export const DanceBreakView = ({ onFinish }: DanceBreakViewProps) => {
       </motion.div>
     </div>
   );
-};
+})
  
 export default DanceBreakView;
