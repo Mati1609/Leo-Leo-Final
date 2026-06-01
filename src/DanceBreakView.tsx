@@ -5,6 +5,8 @@
  
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
+import { Music } from 'lucide-react';
+import { soundService } from './services/soundService';
  
 interface DanceBreakViewProps {
   onFinish: () => void;
