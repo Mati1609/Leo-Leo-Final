@@ -10,18 +10,6 @@ interface DanceBreakViewProps {
   onFinish: () => void;
 }
  
-// Fixed positions so animals don't jump around on re-render
-const ANIMALS = [
-  { src: '/leon base.png', top: '3%',  left: '2%',   size: 118, delay: 0.0, dur: 1.8, flip: false },
-  { src: '/tigre.png',     top: '2%',  right: '3%',  size: 112, delay: 0.4, dur: 2.1, flip: true  },
-  { src: '/puma.png',      top: '32%', left: '1%',   size: 104, delay: 0.8, dur: 1.6, flip: false },
-  { src: '/panda.png',     top: '35%', right: '1%',  size: 104, delay: 0.2, dur: 2.0, flip: true  },
-  { src: '/leon base.png', bottom: '26%', left: '2%',  size: 108, delay: 0.6, dur: 1.7, flip: true  },
-  { src: '/tigre.png',     bottom: '24%', right: '2%', size: 100, delay: 1.0, dur: 1.9, flip: false },
-  { src: '/puma.png',      bottom: '4%',  left: '18%', size: 100, delay: 0.3, dur: 2.2, flip: false },
-  { src: '/panda.png',     bottom: '3%',  right: '16%',size: 96,  delay: 0.7, dur: 1.5, flip: true  },
-];
- 
 export const DanceBreakView = ({ onFinish }: DanceBreakViewProps) => {
   const [countdown, setCountdown] = useState(12);
  
