@@ -10,15 +10,15 @@ interface DanceBreakViewProps {
   onFinish: () => void;
 }
 
-const PETS = [
-  '/leon-lenguaje.png',
-  '/leon-matematicas.png',
-  '/leon-historia.png',
-  '/leon-ciencias.png',
-  '/leon base.png',
-  '/puma.png',
-  '/panda.png',
-  '/tigre.png'
+const ANIMALS = [
+  { src: '/leon base.png'},
+  { src: '/tigre.png' },
+  { src: '/puma.png' },
+  { src: '/panda.png' },
+  { src: '/leon base.png' },
+  { src: '/tigre.png'},
+  { src: '/puma.png' },
+  { src: '/panda.png' },
 ];
  
 export const DanceBreakView = ({ onFinish }: DanceBreakViewProps) => {
