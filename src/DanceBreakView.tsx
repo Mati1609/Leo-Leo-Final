@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Music } from 'lucide-react';
-import { soundService } from '../services/soundService';
+import { soundService } from './services/soundService';
 
 interface DanceBreakViewProps {
   onFinish: () => void;
