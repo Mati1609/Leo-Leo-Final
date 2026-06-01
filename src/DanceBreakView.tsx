@@ -167,4 +167,4 @@ export const DanceBreakView = ({ onFinish }: DanceBreakViewProps) => {
       </motion.div>
     </div>
   );
-})
+});
