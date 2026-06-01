@@ -31,6 +31,23 @@ export const DanceBreakView = ({ onFinish }: DanceBreakViewProps) => {
     const t = setTimeout(() => setCountdown(c => c - 1), 1000);
     return () => clearTimeout(t);
   }, [countdown, onFinish]);
+ useEffect(() => {
+    soundService.playDanceMusic();
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+      soundService.stopDanceMusic();
+    };
  
   return (
     <div
